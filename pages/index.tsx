@@ -1,7 +1,7 @@
 import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
@@ -14,7 +14,7 @@ const TextSerifStyle = css`
   font-family: "Noto Serif KR", serif;
 `;
 const TextSansStyle = css`
-  font-family: "Noto Sans KR", sans-serif;
+  font-family: sans-serif;
 `;
 
 const Main = styled.main`
@@ -28,8 +28,11 @@ const Main = styled.main`
   text-align: center;
   line-height: 2.5;
 
-  button:hover {
-    cursor: pointer;
+  button {
+    outline: none;
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   h2 {
@@ -41,7 +44,7 @@ const Main = styled.main`
   }
 
   strong {
-    font-weight: 700;
+    font-weight: 500;
   }
 `;
 
@@ -50,7 +53,7 @@ const Header = styled.h1`
   margin: 40px 0;
 
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 2.5;
 
   hr {
@@ -79,7 +82,7 @@ const SectionHr = styled.hr`
 
 const SectionHeader = styled.h2`
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 500;
 `;
 
 const GreetingP = styled.p`
@@ -159,9 +162,9 @@ const SliderWrap = styled.div`
     div {
       outline: none;
     }
-  }
-  .slick-slide img {
-    width: 100%;
+    img {
+      width: 100%;
+    }
   }
 `;
 
@@ -201,14 +204,11 @@ const CopyTextButton = styled.button`
   }
 `;
 const CopyText = ({ text }: { text: string }) => {
-  const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(text);
-    alert("복사 되었습니다!");
-  };
+  const handleCopyText = () => navigator.clipboard.writeText(text);
   return (
     <>
       {text}
-      <CopyTextButton onClick={copyToClipboard}>
+      <CopyTextButton onClick={handleCopyText}>
         <Copy />
       </CopyTextButton>
     </>
@@ -227,20 +227,41 @@ const WriteSectionSubHeader = styled.div`
   }
 `;
 
-const WriteButton = styled.button`
+const WriteButton = styled.button<{ visible: boolean }>`
   ${TextSansStyle}
-  width: calc(100% - 24px);
+  ${({ visible }) =>
+    visible
+      ? css`
+          bottom: 40px;
+        `
+      : css`
+          bottom: -100px;
+        `}
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: calc(400px - 40px);
   padding: 16px;
   border: 0;
   border-radius: 8px;
-  margin: 12px;
-  font-size: 16px;
   color: white;
+  font-size: 16px;
+  font-weight: bold;
   background: rgba(255, 136, 170, 0.9);
-`;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transition: bottom 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  `;
 
 const ChatWrap = styled.div`
+  position: relative;
   padding: 20px;
+  margin-bottom: 100px;
+`;
+
+const WriteButtonTrigger = styled.div`
+  position: absolute;
+  top: 100px;
 `;
 
 type Chat = {
@@ -312,8 +333,23 @@ const ChatBubble = ({ chat }: ChatBubbleProps) => {
 };
 
 const Home = () => {
-  const slider = useRef<Slider>(null);
   const [isGalleryModalShown, setGalleryModalShown] = useState(false);
+  const [isWriteButtonShown, setWriteButtonShown] = useState(false);
+
+  const sliderRef = useRef<Slider>(null);
+  const writeButtonTriggerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!writeButtonTriggerRef.current) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      setWriteButtonShown(entry.isIntersecting);
+    });
+    observer.observe(writeButtonTriggerRef.current);
+
+    return () => observer.disconnect();
+  }, [writeButtonTriggerRef]);
 
   const sampleChat1: Chat = {
     author: "이준영",
@@ -329,7 +365,7 @@ const Home = () => {
   };
 
   const handlePhotoClick = (i: number) => {
-    slider.current?.slickGoTo(i);
+    sliderRef.current?.slickGoTo(i, true);
     setGalleryModalShown(true);
   };
 
@@ -403,6 +439,7 @@ const Home = () => {
           {Array.from(Array(14), (_, i) => i).map((i) => (
             <li key={i}>
               <img
+                role="button"
                 src={`/photos/p${i + 1}.jpeg`}
                 onClick={() => handlePhotoClick(i)}
               />
@@ -419,7 +456,7 @@ const Home = () => {
               slidesToScroll={1}
               arrows={false}
               dots={false}
-              ref={slider}
+              ref={sliderRef}
             >
               {Array.from(Array(14), (_, i) => i + 1).map((i) => (
                 <div key={i}>
@@ -465,10 +502,11 @@ const Home = () => {
         </WriteSectionSubHeader>
         <div style={{ clear: "both" }} />
         <ChatWrap>
+          <WriteButtonTrigger ref={writeButtonTriggerRef} />
           <ChatBubble chat={sampleChat1} />
           <ChatBubble chat={sampleChat2} />
         </ChatWrap>
-        <WriteButton>😍 나도 한마디</WriteButton>
+        <WriteButton visible={isWriteButtonShown}>😍 나도 한마디</WriteButton>
       </Main>
     </>
   );
