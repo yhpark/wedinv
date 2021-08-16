@@ -38,7 +38,7 @@ type Props = {
 const Modal = ({ children, shown, handleClose }: Props) => {
   return (
     <ModalWrap shown={shown} onClick={handleClose}>
-      <ModalContent>{children}</ModalContent>
+      <ModalContent onClick={e => e.stopPropagation()}>{children}</ModalContent>
     </ModalWrap>
   );
 };
