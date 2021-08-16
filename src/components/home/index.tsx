@@ -175,7 +175,7 @@ const CopyText = ({ text }: { text: string }) => {
 
 const WriteSectionSubHeader = styled.div`
   padding: 0 20px;
-  margin-top: -58px;
+  margin-top: -68px;
   color: #666;
   p:first-child {
     float: left;

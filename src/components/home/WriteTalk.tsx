@@ -47,6 +47,7 @@ const Wrap = styled.div`
   input,
   label,
   div[contenteditable="true"] {
+    appearance: none;
     transition: 0.3s;
   }
 `;
@@ -100,7 +101,7 @@ const PartyLabel = styled.label`
 `;
 
 const BubbleWrap = styled.div<{ party: Party }>`
-  margin-top: 20px;
+  margin: 20px 0;
   ${({ party }) =>
     party === "BRIDE"
       ? css`
@@ -148,14 +149,9 @@ const MsgInput = styled.div<{ party: Party }>`
   }
 `;
 
-const ErrorMsg = styled.div`
-  text-align: center;
-  margin-top: 12px;
-`;
-
 const SubmitButton = styled.input<{ isValid: boolean }>`
   display: block;
-  width: 80%;
+  width: 90%;
   height: 44px;
   border-radius: 8px;
   border: 0;
@@ -170,7 +166,7 @@ const SubmitButton = styled.input<{ isValid: boolean }>`
   ${({ isValid }) =>
     isValid &&
     css`
-      background: rgb(255, 136, 170, 0.5);
+      background: rgb(255, 136, 170, 0.7);
     `}
 `;
 
@@ -199,7 +195,7 @@ const WriteTalk = () => {
     register("msg", {
       required: "내용을 입력해주세요.",
       minLength: { value: 5, message: "내용이 너무 짧아요 (최소 5자 이상)" },
-      maxLength: { value: 300, message: "내용이 너무 길어요 (최대 300자)" },
+      maxLength: { value: 100, message: "내용이 너무 길어요 (최대 100자)" },
     });
   }, []);
 
@@ -255,8 +251,7 @@ const WriteTalk = () => {
                 />
               </div>
             </BubbleWrap>
-            <ErrorMsg>{errMsg}</ErrorMsg>
-            <SubmitButton type="submit" value="글쓰기" isValid={!isValid} />
+            <SubmitButton type="submit" value={(formState.isSubmitted && errMsg) || "글쓰기"} isValid={!isValid} />
           </>
         )}
       </form>

@@ -31,7 +31,7 @@ export const Main = styled.main`
   }
 
   h2 {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
 
   p {
