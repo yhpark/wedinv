@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 
-import Home from "@/components/home";
+import Home from "@/home/components";
 
 const HomePage = () => {
   return (

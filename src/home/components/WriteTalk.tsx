@@ -1,10 +1,15 @@
 import { EmojiBlinkLeft } from "iconoir-react";
-import { useEffect } from "react";
+import {
+  FormEventHandler,
+  KeyboardEventHandler,
+  useEffect,
+  useState,
+} from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
-
+import { mutate } from "swr";
+import { Party } from "../types";
 import { BubbleHeadStyle, TextSansStyle } from "./index.styles";
-import { Party } from "./types";
 
 const BubbleStyle = (party: Party) => css`
   ${TextSansStyle}
@@ -30,9 +35,11 @@ const BubbleStyle = (party: Party) => css`
 `;
 
 const Wrap = styled.div`
+  position: relative;
   padding: 20px;
   border-radius: 30px;
   margin: 0 20px;
+  overflow: hidden;
 
   background: white;
   text-align: start;
@@ -62,7 +69,9 @@ const HighlightStyle = css`
   );
 `;
 
-const Header = styled.h2`
+const Header = styled.h3`
+  margin-bottom: 20px;
+
   text-align: center;
   font-size: 18px;
   font-weight: bold;
@@ -101,7 +110,7 @@ const PartyLabel = styled.label`
 `;
 
 const BubbleWrap = styled.div<{ party: Party }>`
-  margin: 20px 0;
+  margin: 24px 0;
   ${({ party }) =>
     party === "BRIDE"
       ? css`
@@ -162,6 +171,7 @@ const SubmitButton = styled.input<{ isValid: boolean }>`
   font-weight: bold;
   color: white;
   background: rgb(255, 136, 170);
+  outline: none;
 
   ${({ isValid }) =>
     isValid &&
@@ -170,27 +180,45 @@ const SubmitButton = styled.input<{ isValid: boolean }>`
     `}
 `;
 
+const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.25);
+`;
+
 type FormData = {
   author: string;
   party: Party;
   msg: string;
 };
 
-const WriteTalk = () => {
+type Props = { onWrite: () => void };
+
+const WriteTalk = ({ onWrite }: Props) => {
   const { register, handleSubmit, setValue, watch, formState } =
     useForm<FormData>();
-
   const { isValid, dirtyFields, errors } = formState;
+
   const errMsg = Object.values(errors).flatMap((e) =>
     e.message ? [e.message] : []
   )[0];
 
   const party = watch("party");
 
+  const [isLoading, setLoading] = useState(false);
+
   useEffect(() => {
     register("author", {
       required: "이름을 입력해주세요.",
-      maxLength: { value: 20, message: "이름이 너무 길어요." },
+      maxLength: { value: 10, message: "이름이 너무 길어요." },
     });
     register("msg", {
       required: "내용을 입력해주세요.",
@@ -199,7 +227,40 @@ const WriteTalk = () => {
     });
   }, []);
 
-  const onSubmit: SubmitHandler<FormData> = (data) => console.log(data);
+  const handleNameKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  };
+
+  const handleNameInput: FormEventHandler<HTMLDivElement> = (e) => {
+    setValue("author", e.currentTarget.textContent || "", {
+      shouldValidate: true,
+    });
+  };
+
+  const handleMsgInput: FormEventHandler<HTMLDivElement> = (e) =>
+    setValue("msg", e.currentTarget.textContent || "", {
+      shouldValidate: true,
+    });
+
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    try {
+      setLoading(true);
+
+      await fetch("/api/talk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      mutate("/api/talk");
+      onWrite();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Wrap>
@@ -233,28 +294,26 @@ const WriteTalk = () => {
                 <NameInput
                   contentEditable
                   party={party}
-                  onInput={(e) =>
-                    setValue("author", e.currentTarget.textContent || "", {
-                      shouldValidate: true,
-                    })
-                  }
+                  onKeyDown={handleNameKeyDown}
+                  onInput={handleNameInput}
                 />
                 <br />
                 <MsgInput
                   contentEditable
                   party={party}
-                  onInput={(e) =>
-                    setValue("msg", e.currentTarget.textContent || "", {
-                      shouldValidate: true,
-                    })
-                  }
+                  onInput={handleMsgInput}
                 />
               </div>
             </BubbleWrap>
-            <SubmitButton type="submit" value={(formState.isSubmitted && errMsg) || "글쓰기"} isValid={!isValid} />
+            <SubmitButton
+              type="submit"
+              value={(formState.isSubmitted && errMsg) || "글쓰기"}
+              isValid={!isValid}
+            />
           </>
         )}
       </form>
+      {isLoading && <LoadingOverlay />}
     </Wrap>
   );
 };

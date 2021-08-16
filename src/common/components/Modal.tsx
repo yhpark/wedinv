@@ -1,15 +1,7 @@
-import { useState } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
-const ModalWrap = styled.div<{ shown: boolean }>`
-  ${({ shown }) =>
-    shown
-      ? css`
-          display: flex;
-        `
-      : css`
-          display: none;
-        `}
+const ModalWrap = styled.div`
+  display: flex;
   position: fixed;
   z-index: 1;
   left: 0;
@@ -32,13 +24,14 @@ const ModalContent = styled.div`
 
 type Props = {
   children: React.ReactNode;
-  shown: boolean;
   handleClose: () => void;
 };
-const Modal = ({ children, shown, handleClose }: Props) => {
+const Modal = ({ children, handleClose }: Props) => {
   return (
-    <ModalWrap shown={shown} onClick={handleClose}>
-      <ModalContent onClick={e => e.stopPropagation()}>{children}</ModalContent>
+    <ModalWrap onClick={handleClose}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        {children}
+      </ModalContent>
     </ModalWrap>
   );
 };

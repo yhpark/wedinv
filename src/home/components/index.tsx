@@ -7,7 +7,8 @@ import styled, { css } from "styled-components";
 
 import coverPic from "@/public/photos/cover_min.jpg";
 import mapPic from "@/public/photos/map.gif";
-import Modal from "@/components/modal";
+import Modal from "@/common/components/Modal";
+import { GetTalkResponse, Talk } from "../types";
 import {
   BoxShadowStyle,
   Main,
@@ -16,7 +17,7 @@ import {
   TextSansStyle,
 } from "./index.styles";
 import WriteTalk from "./WriteTalk";
-import { Chat } from "./types";
+import useSWR from "swr";
 
 const Header = styled.h1`
   display: inline-block;
@@ -216,10 +217,10 @@ const WriteButton = styled.button<{ visible: boolean }>`
   transition: bottom 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 `;
 
-const ChatWrap = styled.div`
+const TalkWrap = styled.div`
   position: relative;
   padding: 0 20px;
-  margin-bottom: 120px;
+  margin-bottom: 130px;
 `;
 
 const WriteButtonTrigger = styled.div`
@@ -227,7 +228,7 @@ const WriteButtonTrigger = styled.div`
   top: 100px;
 `;
 
-const ChatBubbleWrap = styled.div<{ party: Chat["party"] }>`
+const TalkBubbleWrap = styled.div<{ party: Talk["party"] }>`
   ${TextSansStyle}
   margin-bottom: 10px;
   &:last-child {
@@ -282,21 +283,23 @@ const ChatBubbleWrap = styled.div<{ party: Chat["party"] }>`
   }
 `;
 
-type ChatBubbleProps = { chat: Chat };
-const ChatBubble = ({ chat }: ChatBubbleProps) => {
+type TalkBubbleProps = { talk: Talk };
+const TalkBubble = ({ talk }: TalkBubbleProps) => {
   return (
-    <ChatBubbleWrap party={chat.party}>
-      {chat.party === "BRIDE" ? <EmojiLookLeft /> : <EmojiLookRight />}
+    <TalkBubbleWrap party={talk.party}>
+      {talk.party === "BRIDE" ? <EmojiLookLeft /> : <EmojiLookRight />}
       <div>
-        {chat.author}
+        {talk.author}
         <br />
-        <p>{chat.msg}</p>
+        <p>{talk.msg}</p>
       </div>
-    </ChatBubbleWrap>
+    </TalkBubbleWrap>
   );
 };
 
 const Home = () => {
+  const { data, error } = useSWR<GetTalkResponse>("/api/talk");
+
   const [isGalleryModalShown, setGalleryModalShown] = useState(false);
   const [isWriteModalShown, setWriteModalShown] = useState(false);
   const [isWriteButtonShown, setWriteButtonShown] = useState(false);
@@ -316,19 +319,6 @@ const Home = () => {
     return () => observer.disconnect();
   }, [writeButtonTriggerRef]);
 
-  const sampleChat1: Chat = {
-    author: "이준영",
-    party: "BRIDE",
-    msg: "축하해!!!",
-    created: new Date(),
-  };
-  const sampleChat2: Chat = {
-    author: "이준영",
-    party: "GROOM",
-    msg: "호어엉이!!",
-    created: new Date(),
-  };
-
   const handlePhotoClick = (i: number) => {
     sliderRef.current?.slickGoTo(i, true);
     setGalleryModalShown(true);
@@ -339,6 +329,11 @@ const Home = () => {
   const handleWriteButtonClick = () => setWriteModalShown(true);
 
   const handleWriteModalClose = () => setWriteModalShown(false);
+
+  const handleWrite = () => {
+    localStorage["talk.write.done"] = true;
+    setWriteModalShown(false);
+  };
 
   return (
     <Main>
@@ -406,23 +401,25 @@ const Home = () => {
           </li>
         ))}
       </WeddingPhotoGallery>
-      <Modal shown={isGalleryModalShown} handleClose={handleGalleryModalClose}>
-        <SliderWrap onClick={handleGalleryModalClose}>
-          <Slider
-            slidesToShow={1}
-            slidesToScroll={1}
-            arrows={false}
-            dots={false}
-            ref={sliderRef}
-          >
-            {Array.from(Array(14), (_, i) => i + 1).map((i) => (
-              <div key={i}>
-                <img src={`/photos/p${i}.jpeg`} />
-              </div>
-            ))}
-          </Slider>
-        </SliderWrap>
-      </Modal>
+      {isGalleryModalShown && (
+        <Modal handleClose={handleGalleryModalClose}>
+          <SliderWrap onClick={handleGalleryModalClose}>
+            <Slider
+              slidesToShow={1}
+              slidesToScroll={1}
+              arrows={false}
+              dots={false}
+              ref={sliderRef}
+            >
+              {Array.from(Array(14), (_, i) => i + 1).map((i) => (
+                <div key={i}>
+                  <img src={`/photos/p${i}.jpeg`} />
+                </div>
+              ))}
+            </Slider>
+          </SliderWrap>
+        </Modal>
+      )}
       <SectionHr />
       <SectionHeader>오시는 길</SectionHeader>
       <Image src={mapPic} width="400px" />
@@ -458,20 +455,23 @@ const Home = () => {
         <p>신부측</p>
       </WriteSectionSubHeader>
       <div style={{ clear: "both" }} />
-      <ChatWrap>
+      <TalkWrap>
         <WriteButtonTrigger ref={writeButtonTriggerRef} />
-        <ChatBubble chat={sampleChat1} />
-        <ChatBubble chat={sampleChat2} />
-      </ChatWrap>
+        {data?.talks.map((talk, idx) => (
+          <TalkBubble key={idx} talk={talk} />
+        ))}
+      </TalkWrap>
       <WriteButton
         visible={isWriteButtonShown}
         onClick={handleWriteButtonClick}
       >
         😍 나도 한마디
       </WriteButton>
-      <Modal shown={isWriteModalShown} handleClose={handleWriteModalClose}>
-        <WriteTalk />
-      </Modal>
+      {isWriteModalShown && (
+        <Modal handleClose={handleWriteModalClose}>
+          <WriteTalk onWrite={handleWrite} />
+        </Modal>
+      )}
     </Main>
   );
 };
