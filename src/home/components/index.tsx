@@ -1,6 +1,3 @@
-import Modal from "@/common/components/Modal";
-import coverPic from "@/public/photos/cover_min.jpg";
-import mapPic from "@/public/photos/map.gif";
 import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
@@ -8,6 +5,12 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
 import useSWR from "swr";
+
+import Modal from "@/common/components/Modal";
+import timeDiffFormat from "@/common/utils/timeDiffFormat";
+import useStorage from "@/common/hooks/useStorage";
+import coverPic from "@/public/photos/cover_min.jpg";
+import mapPic from "@/public/photos/map.gif";
 import { GetTalkResponse, Talk } from "../types";
 import {
   BoxShadowStyle,
@@ -128,14 +131,16 @@ const SliderWrap = styled.div`
 
 const MapButton = styled.a`
   ${TextSansStyle}
-  padding: 8px 14px 8px 10px;
+  display: inline-block;
+  padding: 8px 16px 8px 10px;
   border: 0;
   border-radius: 18px;
-  margin: 10px;
+  margin: 0 10px;
   color: #666;
   font-size: 13px;
   text-decoration: none;
   background: #f3f3f3;
+  line-height: 1;
   > svg {
     margin-right: 4px;
     vertical-align: text-bottom;
@@ -219,7 +224,7 @@ const WriteButton = styled.button<{ visible: boolean }>`
 const TalkWrap = styled.div`
   position: relative;
   padding: 0 20px;
-  margin-bottom: 130px;
+  margin: 20px 0;
 `;
 
 const WriteButtonTrigger = styled.div`
@@ -250,34 +255,54 @@ const TalkBubbleWrap = styled.div<{ party: Talk["party"] }>`
     padding: 8px;
     border-radius: 20px;
   }
-  div {
+  > div {
     ${({ party }) =>
       party === "BRIDE"
         ? css`
-            margin-right: 46px;
+            margin-right: 44px;
             text-align: right;
           `
         : css`
-            margin-left: 46px;
+            margin-left: 44px;
             text-align: left;
           `}
     line-height: 1.3;
-    p {
-      text-align: left;
-      word-break: break-all;
-      overflow-wrap: break-word;
-      display: inline-block;
-      padding: 10px 16px;
+    div.hi {
+      display: flex;
       ${({ party }) =>
         party === "BRIDE"
           ? css`
-              border-radius: 20px 4px 20px 20px;
+              flex-direction: row-reverse;
             `
           : css`
-              border-radius: 4px 20px 20px 20px;
+              flex-direction: row;
             `}
-      margin: 6px 0 0 0;
-      background: #eee;
+
+      p {
+        text-align: left;
+        word-break: break-all;
+        overflow-wrap: break-word;
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 4px 0 0 0;
+        ${({ party }) =>
+          party === "BRIDE"
+            ? css`
+                border-radius: 20px 4px 20px 20px;
+                margin-left: 3px;
+              `
+            : css`
+                border-radius: 4px 20px 20px 20px;
+                margin-right: 3px;
+              `}
+        background: #eee;
+      }
+      small {
+        align-self: flex-end;
+        flex-shrink: 0;
+        color: #999;
+        font-size: 11px;
+      }
     }
   }
 `;
@@ -289,15 +314,29 @@ const TalkBubble = ({ talk }: TalkBubbleProps) => {
       {talk.party === "BRIDE" ? <EmojiLookLeft /> : <EmojiLookRight />}
       <div>
         {talk.author}
-        <br />
-        <p>{talk.msg}</p>
+        <div className="hi">
+          <p>{talk.msg}</p>
+          <small>
+            {!talk.published
+              ? "심사중"
+              : timeDiffFormat(new Date(talk.created))}
+          </small>
+        </div>
       </div>
     </TalkBubbleWrap>
   );
 };
 
+const ThankYou = styled.div`
+  padding: 60px;
+  color: #666;
+`;
+
 const Home = () => {
-  const { data, error } = useSWR<GetTalkResponse>("/api/talk");
+  const [writeTalkId, setWriteTalkId] = useStorage("talk.write.id");
+  const { data, error } = useSWR<GetTalkResponse>(
+    `/api/talk?myId=${writeTalkId || ""}`
+  );
 
   const [isGalleryModalShown, setGalleryModalShown] = useState(false);
   const [isWriteModalShown, setWriteModalShown] = useState(false);
@@ -322,7 +361,6 @@ const Home = () => {
 
   const handlePhotoClick = (i: number) => {
     setLastClickedGalleryItem(i);
-    // sliderRef.current?.slickGoTo(i, true);
     setGalleryModalShown(true);
   };
 
@@ -332,8 +370,8 @@ const Home = () => {
 
   const handleWriteModalClose = () => setWriteModalShown(false);
 
-  const handleWrite = () => {
-    localStorage["talk.write.done"] = true;
+  const handleWrite = (id: string) => {
+    setWriteTalkId(id);
     setWriteModalShown(false);
   };
 
@@ -345,7 +383,7 @@ const Home = () => {
         김현주
       </Header>
       <CoverPicWrap>
-        <Image src={coverPic} priority={true} placeholder="blur" />
+        <Image src={coverPic} priority={true} placeholder="blur" alt="" />
       </CoverPicWrap>
       <p>
         2021년 10월 3일 일요일 오후 1시
@@ -462,12 +500,15 @@ const Home = () => {
           <TalkBubble key={idx} talk={talk} />
         ))}
       </TalkWrap>
-      <WriteButton
-        visible={isWriteButtonShown}
-        onClick={handleWriteButtonClick}
-      >
-        😍 나도 한마디
-      </WriteButton>
+      <ThankYou>{writeTalkId ? "감사합니다." : ""}</ThankYou>
+      {!writeTalkId && (
+        <WriteButton
+          visible={isWriteButtonShown}
+          onClick={handleWriteButtonClick}
+        >
+          😍 나도 한마디
+        </WriteButton>
+      )}
       {isWriteModalShown && (
         <Modal handleClose={handleWriteModalClose}>
           <WriteTalk onWrite={handleWrite} />

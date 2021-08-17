@@ -1,33 +1,108 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiHandler } from "next";
+import {
+  GoogleSpreadsheet,
+  GoogleSpreadsheetRow,
+  GoogleSpreadsheetWorksheet,
+} from "google-spreadsheet";
 
-import { GetTalkResponse, PostTalkRequest, Talk } from "@/home/types";
+import type {
+  GetTalkResponse,
+  Party,
+  PostTalkRequest,
+  PostTalkResponse,
+  Talk,
+} from "@/home/types";
 
-let talks: Talk[] = [
-  {
-    author: "이준영",
-    party: "BRIDE",
-    msg: "축하해!!!",
-    created: new Date(),
-  },
-  {
-    author: "이준영",
-    party: "GROOM",
-    msg: "호어엉이!!",
-    created: new Date(),
-  },
+const TalkHeader: (keyof Talk)[] = [
+  "id",
+  "author",
+  "party",
+  "msg",
+  "created",
+  "published",
 ];
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === "POST") {
-    const reqData: PostTalkRequest = req.body;
-    const newTalk = { ...reqData, created: new Date() };
-    talks = [...talks, newTalk];
-    talks.sort((a, b) => b.created.getTime() - a.created.getTime());
-    return res.status(200).json({});
-  }
+let sheet: GoogleSpreadsheetWorksheet | undefined = undefined;
+const getSheet = async () => {
+  if (!sheet) {
+    const doc = new GoogleSpreadsheet(process.env.GUESTBOOK_SHEET_ID);
+    await doc.useServiceAccountAuth({
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL as string,
+      private_key: process.env.GOOGLE_PRIVATE_KEY as string,
+    });
+    await doc.loadInfo();
+    sheet = doc.sheetsByIndex[0];
 
-  const respData: GetTalkResponse = { talks };
+    // set header row
+    if (sheet.headerValues !== TalkHeader) {
+      await sheet.setHeaderRow(TalkHeader);
+    }
+  }
+  return sheet;
+};
+
+const deserializeTalk = (r: GoogleSpreadsheetRow) => {
+  const talk: Talk = {
+    id: r.id as string,
+    author: r.author as string,
+    party: r.party as Party,
+    msg: r.msg as string,
+    created: new Date(r.created + " GMT+0900").getTime(),
+    published: r.published === "TRUE",
+  };
+  return talk;
+};
+
+const serializeTalk = (talk: Talk) => {
+  console.log(talk);
+  return {
+    ...talk,
+    created: new Date(talk.created)
+      .toLocaleString("en", { timeZone: "Asia/Seoul" })
+      .replace(/,/g, ""),
+  };
+};
+
+const handleGet: NextApiHandler<GetTalkResponse> = async (req, res) => {
+  const myId = req.query["myId"] as string;
+
+  const sheet = await getSheet();
+
+  const rows = await sheet.getRows();
+  const allTalks = rows.map(deserializeTalk);
+  allTalks.sort((a, b) => b.created - a.created);
+
+  const visibleTalks = allTalks.filter((t) => t.published || t.id === myId);
+
+  const respData: GetTalkResponse = { talks: visibleTalks };
   res.status(200).json(respData);
+};
+
+const handlePost: NextApiHandler<PostTalkResponse> = async (req, res) => {
+  const reqData: PostTalkRequest = req.body;
+
+  const created = Date.now();
+  const newTalk: Talk = {
+    ...reqData,
+    id: created.toString(),
+    created: created,
+    published: false,
+  };
+
+  const sheet = await getSheet();
+  await sheet.addRow(serializeTalk(newTalk));
+
+  const respData: PostTalkResponse = { id: newTalk.id };
+  res.status(200).json(respData);
+};
+
+const handler: NextApiHandler = async (req, res) => {
+  if (req.method === "GET") {
+    return handleGet(req, res);
+  } else if (req.method === "POST") {
+    return handlePost(req, res);
+  }
+  res.status(400);
 };
 
 export default handler;

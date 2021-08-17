@@ -7,8 +7,8 @@ import {
 } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
-import { mutate } from "swr";
-import { Party } from "../types";
+
+import { Party, PostTalkResponse } from "../types";
 import { BubbleHeadStyle, TextSansStyle } from "./index.styles";
 
 const BubbleStyle = (party: Party) => css`
@@ -200,7 +200,7 @@ type FormData = {
   msg: string;
 };
 
-type Props = { onWrite: () => void };
+type Props = { onWrite: (id: string) => void };
 
 const WriteTalk = ({ onWrite }: Props) => {
   const { register, handleSubmit, setValue, watch, formState } =
@@ -248,15 +248,16 @@ const WriteTalk = ({ onWrite }: Props) => {
     try {
       setLoading(true);
 
-      await fetch("/api/talk", {
+      const resp = await fetch("/api/talk", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      mutate("/api/talk");
-      onWrite();
+      const { id } = (await resp.json()) as PostTalkResponse;
+
+      onWrite(id);
     } finally {
       setLoading(false);
     }
