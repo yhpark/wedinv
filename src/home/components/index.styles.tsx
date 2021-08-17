@@ -23,6 +23,13 @@ export const Main = styled.main`
   text-align: center;
   line-height: 2.5;
 
+  a:link,
+  a:visited,
+  a:hover {
+    text-decoration: none;
+    color: #333;
+  }
+
   button {
     outline: none;
     &:hover {

@@ -1,13 +1,13 @@
+import Modal from "@/common/components/Modal";
+import coverPic from "@/public/photos/cover_min.jpg";
+import mapPic from "@/public/photos/map.gif";
 import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
-
-import coverPic from "@/public/photos/cover_min.jpg";
-import mapPic from "@/public/photos/map.gif";
-import Modal from "@/common/components/Modal";
+import useSWR from "swr";
 import { GetTalkResponse, Talk } from "../types";
 import {
   BoxShadowStyle,
@@ -17,7 +17,6 @@ import {
   TextSansStyle,
 } from "./index.styles";
 import WriteTalk from "./WriteTalk";
-import useSWR from "swr";
 
 const Header = styled.h1`
   display: inline-block;
@@ -167,7 +166,7 @@ const CopyText = ({ text }: { text: string }) => {
   return (
     <>
       {text}
-      <CopyTextButton onClick={handleCopyText}>
+      <CopyTextButton onClick={handleCopyText} aria-label="복사">
         <Copy />
       </CopyTextButton>
     </>
@@ -303,6 +302,8 @@ const Home = () => {
   const [isGalleryModalShown, setGalleryModalShown] = useState(false);
   const [isWriteModalShown, setWriteModalShown] = useState(false);
   const [isWriteButtonShown, setWriteButtonShown] = useState(false);
+  const [lastClickedGalleryItem, setLastClickedGalleryItem] =
+    useState<number>();
 
   const sliderRef = useRef<Slider>(null);
   const writeButtonTriggerRef = useRef<HTMLDivElement>(null);
@@ -320,7 +321,8 @@ const Home = () => {
   }, [writeButtonTriggerRef]);
 
   const handlePhotoClick = (i: number) => {
-    sliderRef.current?.slickGoTo(i, true);
+    setLastClickedGalleryItem(i);
+    // sliderRef.current?.slickGoTo(i, true);
     setGalleryModalShown(true);
   };
 
@@ -343,7 +345,7 @@ const Home = () => {
         김현주
       </Header>
       <CoverPicWrap>
-        <Image src={coverPic} />
+        <Image src={coverPic} priority={true} placeholder="blur" />
       </CoverPicWrap>
       <p>
         2021년 10월 3일 일요일 오후 1시
@@ -370,24 +372,20 @@ const Home = () => {
         박민양 · 최승현의 차남 영훈
       </GreetingP>
       <CallWrap>
-        <CallButton
-          icon={
-            <a href="tel:01071056849">
-              <EmojiLookRight />
-            </a>
-          }
-          bgColor="#abdaab"
-          label="신랑측에 연락하기"
-        />
-        <CallButton
-          icon={
-            <a href="tel:01073692869">
-              <EmojiLookLeft />
-            </a>
-          }
-          bgColor="#c2e0a3"
-          label="신부측에 연락하기"
-        />
+        <a href="tel:01071056849">
+          <CallButton
+            icon={<EmojiLookRight />}
+            bgColor="#abdaab"
+            label="신랑측에 연락하기"
+          />
+        </a>
+        <a href="tel:01073692869">
+          <CallButton
+            icon={<EmojiLookLeft />}
+            bgColor="#c2e0a3"
+            label="신부측에 연락하기"
+          />
+        </a>
       </CallWrap>
       <SectionHr />
       <WeddingPhotoGallery>
@@ -397,6 +395,8 @@ const Home = () => {
               role="button"
               src={`/photos/p${i + 1}.jpeg`}
               onClick={() => handlePhotoClick(i)}
+              loading="lazy"
+              alt=""
             />
           </li>
         ))}
@@ -405,6 +405,7 @@ const Home = () => {
         <Modal handleClose={handleGalleryModalClose}>
           <SliderWrap onClick={handleGalleryModalClose}>
             <Slider
+              initialSlide={lastClickedGalleryItem}
               slidesToShow={1}
               slidesToScroll={1}
               arrows={false}
@@ -413,7 +414,7 @@ const Home = () => {
             >
               {Array.from(Array(14), (_, i) => i + 1).map((i) => (
                 <div key={i}>
-                  <img src={`/photos/p${i}.jpeg`} />
+                  <img src={`/photos/p${i}.jpeg`} alt="" />
                 </div>
               ))}
             </Slider>
@@ -422,7 +423,7 @@ const Home = () => {
       )}
       <SectionHr />
       <SectionHeader>오시는 길</SectionHeader>
-      <Image src={mapPic} width="400px" />
+      <Image src={mapPic} width="400px" alt="" />
       <p>
         서울 서초구 신반포로 176
         <br />

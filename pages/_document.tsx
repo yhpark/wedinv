@@ -35,12 +35,43 @@ export default class MyDocument extends Document {
   }
   render() {
     return (
-      <Html>
+      <Html lang="ko">
         <Head>
           <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap"
-            rel="stylesheet"
+            rel="preconnect"
+            href="https://fonts.googleapis.com"
+            crossOrigin="anonymous"
           />
+
+          <link
+            rel="preload"
+            href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap"
+            as="style"
+          />
+
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `</style>
+                        <link
+                          rel="stylesheet"
+                          href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap"
+                          media="print"
+                          onload="this.media='all';"
+                        />
+                        <style>`,
+            }}
+          ></style>
+
+          <noscript>
+            <link
+              rel="stylesheet"
+              type="text/css"
+              href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap"
+            />
+          </noscript>
+
+          {/* next.js font optimization 은 IE의 User Agent 로 요청한 응답도
+           가져오기 때문에 (getFontDefinitionFromNetwork) 전체 폰트를 다운로드하는 문제가 있음. */}
         </Head>
         <body>
           <Main />
