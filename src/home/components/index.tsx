@@ -140,10 +140,13 @@ const MapButton = styled.a`
   font-size: 13px;
   text-decoration: none;
   background: #f3f3f3;
-  line-height: 1;
+  line-height: 1.3;
   > svg {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: -4px 0;
     margin-right: 4px;
-    vertical-align: text-bottom;
   }
 `;
 
