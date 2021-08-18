@@ -72,7 +72,7 @@ export default class MyDocument extends Document {
           {/* Google Analytics */}
           <script
             async
-            src="https://www.googletagmanager.com/gtag/js?id=UA-1655798-7"
+            src="https://www.googletagmanager.com/gtag/js?id=G-YG30TYCGWP"
           />
           <script
             dangerouslySetInnerHTML={{
@@ -80,7 +80,7 @@ export default class MyDocument extends Document {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'UA-1655798-7');
+              gtag('config', 'G-YG30TYCGWP');
             `,
             }}
           />
