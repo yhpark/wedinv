@@ -1,18 +1,23 @@
-import { EmojiBlinkLeft } from "iconoir-react";
+import useStorage from "@/common/hooks/useStorage";
+import randomInt from "@/common/utils/randomInt";
+import { EmojiLookLeft, EmojiLookRight } from "iconoir-react";
 import {
   FormEventHandler,
   KeyboardEventHandler,
+  MouseEventHandler,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled, { css } from "styled-components";
 
-import { Party, PostTalkResponse } from "../types";
-import { BubbleHeadStyle, TextSansStyle } from "./index.styles";
+import { Party, PostTalkRequest, PostTalkResponse } from "../types";
+import { BubbleHeadStyle, TextSansStyle } from "./styles";
 
 const BubbleStyle = (party: Party) => css`
   ${TextSansStyle}
+  white-space: pre-wrap;
   display: inline-block;
   padding: 10px 16px;
   border: none;
@@ -109,7 +114,7 @@ const PartyLabel = styled.label`
   }
 `;
 
-const BubbleWrap = styled.div<{ party: Party }>`
+const BubbleWrap = styled.div<{ party: Party; color: string }>`
   margin: 24px 0;
   ${({ party }) =>
     party === "BRIDE"
@@ -120,7 +125,7 @@ const BubbleWrap = styled.div<{ party: Party }>`
           text-align: left;
         `}
   svg {
-    ${({ party }) => BubbleHeadStyle(party)}
+    ${({ party, color }) => BubbleHeadStyle(party, color)}
   }
   > div {
     ${({ party }) =>
@@ -136,7 +141,7 @@ const BubbleWrap = styled.div<{ party: Party }>`
   }
 `;
 
-const NameInput = styled.div<{ party: Party }>`
+const AuthorInput = styled.div<{ party: Party }>`
   ${({ party }) => BubbleStyle(party)}
   display: inline-block;
   text-align: start;
@@ -158,13 +163,35 @@ const MsgInput = styled.div<{ party: Party }>`
   }
 `;
 
+const PasswordWrap = styled.div`
+  text-align: center;
+  marg label {
+    color: #666;
+  }
+`;
+const PasswordInput = styled.input`
+  padding: 12px 0;
+  border-radius: 8px;
+  border: 1px solid rgb(255, 136, 170);
+  margin-top: 4px;
+
+  background: rgb(255, 136, 170, 0.1);
+  text-align: center;
+  outline: none;
+  color: rgb(255, 136, 170);
+
+  &:focus {
+    background: white;
+  }
+`;
+
 const SubmitButton = styled.input<{ isValid: boolean }>`
   display: block;
   width: 90%;
   height: 44px;
   border-radius: 8px;
   border: 0;
-  margin: 12px auto 0;
+  margin: 24px auto 0;
 
   text-align: center;
   font-size: 16px;
@@ -174,7 +201,7 @@ const SubmitButton = styled.input<{ isValid: boolean }>`
   outline: none;
 
   ${({ isValid }) =>
-    isValid &&
+    !isValid &&
     css`
       background: rgb(255, 136, 170, 0.7);
     `}
@@ -194,16 +221,21 @@ const LoadingOverlay = styled.div`
   background: rgba(0, 0, 0, 0.25);
 `;
 
-type FormData = {
-  author: string;
-  party: Party;
-  msg: string;
-};
+const TalkHeadColors = [
+  "#ECC8F7",
+  "#F7C8D3",
+  "#e5d3b3",
+  "#fed0b0",
+  "#abdaab",
+  "#c8d3f7",
+];
+
+type FormData = PostTalkRequest;
 
 type Props = { onWrite: (id: string) => void };
 
 const WriteTalk = ({ onWrite }: Props) => {
-  const { register, handleSubmit, setValue, watch, formState } =
+  const { register, handleSubmit, setValue, setFocus, watch, formState } =
     useForm<FormData>();
   const { isValid, dirtyFields, errors } = formState;
 
@@ -212,20 +244,40 @@ const WriteTalk = ({ onWrite }: Props) => {
   )[0];
 
   const party = watch("party");
+  const color = watch("color");
 
   const [isLoading, setLoading] = useState(false);
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
+
+  const [storedAuthor, setStoredAuthor] = useStorage("talk.write.cache.author");
+  const [cachedAuthor] = useState(storedAuthor);
+  const [storedMsg, setStoredMsg] = useStorage("talk.write.cache.msg");
+  const [cachedMsg] = useState(storedMsg);
 
   useEffect(() => {
     register("author", {
       required: "이름을 입력해주세요.",
       maxLength: { value: 10, message: "이름이 너무 길어요." },
+      value: cachedAuthor || "",
     });
     register("msg", {
       required: "내용을 입력해주세요.",
-      minLength: { value: 5, message: "내용이 너무 짧아요 (최소 5자 이상)" },
-      maxLength: { value: 100, message: "내용이 너무 길어요 (최대 100자)" },
+      minLength: { value: 5, message: "내용이 너무 짧아요 (5자 이상)" },
+      maxLength: { value: 100, message: "내용이 너무 길어요 (100자 이하)" },
+      value: cachedMsg || "",
     });
-  }, []);
+    register("color", {
+      value: TalkHeadColors[randomInt(0, TalkHeadColors.length - 1)],
+    });
+  }, [register, cachedAuthor, cachedMsg]);
+
+  const handleHeadClick: MouseEventHandler<SVGElement> = (e) => {
+    const nextColor =
+      TalkHeadColors[
+        (TalkHeadColors.indexOf(color) + 1) % TalkHeadColors.length
+      ];
+    setValue("color", nextColor);
+  };
 
   const handleNameKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
     if (e.key === "Enter") {
@@ -237,22 +289,27 @@ const WriteTalk = ({ onWrite }: Props) => {
     setValue("author", e.currentTarget.textContent || "", {
       shouldValidate: true,
     });
+    setStoredAuthor(e.currentTarget.textContent || "");
   };
 
-  const handleMsgInput: FormEventHandler<HTMLDivElement> = (e) =>
+  const handleMsgInput: FormEventHandler<HTMLDivElement> = (e) => {
     setValue("msg", e.currentTarget.textContent || "", {
       shouldValidate: true,
     });
+    setStoredMsg(e.currentTarget.textContent || "");
+  };
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
+    if (!data.password) {
+      setShowPasswordInput(true);
+      return;
+    }
     try {
       setLoading(true);
 
       const resp = await fetch("/api/talk", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
       const { id } = (await resp.json()) as PostTalkResponse;
@@ -263,6 +320,19 @@ const WriteTalk = ({ onWrite }: Props) => {
     }
   };
 
+  const step1 = !dirtyFields["party"];
+  const step2 = dirtyFields["party"] && !showPasswordInput;
+  const step3 = showPasswordInput;
+
+  const authorInputRef = useRef<HTMLDivElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    authorInputRef.current?.focus();
+  }, [step2]);
+  useEffect(() => {
+    passwordInputRef.current?.focus();
+  }, [step3]);
+
   return (
     <Wrap>
       <Header>
@@ -270,48 +340,79 @@ const WriteTalk = ({ onWrite }: Props) => {
       </Header>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <PartyRow>
-          <input
-            {...register("party", { required: true })}
-            type="radio"
-            value="BROOM"
-            id="broom"
-          />
-          <PartyLabel htmlFor="broom">🤵🏻‍♂️ 신랑측</PartyLabel>
-          <input
-            {...register("party", { required: true })}
-            type="radio"
-            value="BRIDE"
-            id="bride"
-          />
-          <PartyLabel htmlFor="bride">👰🏻‍♀️ 신부측</PartyLabel>
-        </PartyRow>
+        {(step1 || step2) && (
+          <PartyRow>
+            <input
+              {...register("party", { required: true })}
+              type="radio"
+              value="BROOM"
+              id="broom"
+            />
+            <PartyLabel htmlFor="broom">🤵🏻‍♂️ 신랑측</PartyLabel>
+            <input
+              {...register("party", { required: true })}
+              type="radio"
+              value="BRIDE"
+              id="bride"
+            />
+            <PartyLabel htmlFor="bride">👰🏻‍♀️ 신부측</PartyLabel>
+          </PartyRow>
+        )}
 
-        {dirtyFields["party"] && (
+        {step2 && (
           <>
-            <BubbleWrap party={party}>
-              <EmojiBlinkLeft />
+            <BubbleWrap party={party} color={color}>
+              {party === "BRIDE" ? (
+                <EmojiLookLeft onClick={handleHeadClick} />
+              ) : (
+                <EmojiLookRight onClick={handleHeadClick} />
+              )}
               <div>
-                <NameInput
+                <AuthorInput
                   contentEditable
+                  ref={authorInputRef}
                   party={party}
                   onKeyDown={handleNameKeyDown}
                   onInput={handleNameInput}
-                />
+                >
+                  {cachedAuthor || ""}
+                </AuthorInput>
                 <br />
                 <MsgInput
                   contentEditable
                   party={party}
                   onInput={handleMsgInput}
-                />
+                >
+                  {cachedMsg || ""}
+                </MsgInput>
               </div>
             </BubbleWrap>
-            <SubmitButton
-              type="submit"
-              value={(formState.isSubmitted && errMsg) || "글쓰기"}
-              isValid={!isValid}
-            />
           </>
+        )}
+
+        {step3 && (
+          <PasswordWrap>
+            <label htmlFor="password">작성하신 글의 암호를 입력해주세요.</label>
+            <PasswordInput
+              {...register("password", {
+                required: true,
+                minLength: {
+                  value: 4,
+                  message: "암호가 너무 짧아요 (4자 이상)",
+                },
+              })}
+              ref={passwordInputRef}
+              id="password"
+              type="password"
+            />
+          </PasswordWrap>
+        )}
+        {(step2 || step3) && (
+          <SubmitButton
+            type="submit"
+            value={(formState.isSubmitted && errMsg) || "글쓰기"}
+            isValid={isValid}
+          />
         )}
       </form>
       {isLoading && <LoadingOverlay />}

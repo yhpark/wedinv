@@ -62,16 +62,15 @@ export const SectionHeader = styled.h2`
   font-weight: 500;
 `;
 
-export const BubbleHeadStyle = (party: Party) => css`
+export const BubbleHeadStyle = (party: Party, color: string) => css`
   ${party === "BRIDE"
     ? css`
         float: right;
-        background: #c2e0a3;
       `
     : css`
         float: left;
-        background: #abdaab;
       `}
+  background: ${color};
   width: 22px;
   height: 22px;
   color: white;

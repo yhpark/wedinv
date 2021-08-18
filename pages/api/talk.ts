@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+import { promisify } from "node:util";
 import type { NextApiHandler } from "next";
 import {
   GoogleSpreadsheet,
@@ -13,12 +15,17 @@ import type {
   Talk,
 } from "@/home/types";
 
-const TalkHeader: (keyof Talk)[] = [
+const scrypt = promisify(crypto.scrypt);
+
+type SheetTalk = Talk & { password: string };
+
+const TalkHeader: (keyof SheetTalk)[] = [
   "id",
   "author",
   "party",
   "msg",
   "created",
+  "password",
   "published",
 ];
 
@@ -34,7 +41,8 @@ const getSheet = async () => {
     sheet = doc.sheetsByIndex[0];
 
     // set header row
-    if (sheet.headerValues !== TalkHeader) {
+    await sheet.loadHeaderRow();
+    if (sheet.headerValues.length === 0) {
       await sheet.setHeaderRow(TalkHeader);
     }
   }
@@ -42,19 +50,20 @@ const getSheet = async () => {
 };
 
 const deserializeTalk = (r: GoogleSpreadsheetRow) => {
-  const talk: Talk = {
+  const talk: SheetTalk = {
     id: r.id as string,
     author: r.author as string,
+    color: r.color as string,
     party: r.party as Party,
     msg: r.msg as string,
     created: new Date(r.created + " GMT+0900").getTime(),
+    password: r.password,
     published: r.published === "TRUE",
   };
   return talk;
 };
 
-const serializeTalk = (talk: Talk) => {
-  console.log(talk);
+const serializeTalk = (talk: SheetTalk) => {
   return {
     ...talk,
     created: new Date(talk.created)
@@ -62,6 +71,9 @@ const serializeTalk = (talk: Talk) => {
       .replace(/,/g, ""),
   };
 };
+
+const hashPasword = async (password: string) =>
+  ((await scrypt(password, "D7zboYc4Uc", 16)) as Buffer).toString("hex");
 
 const handleGet: NextApiHandler<GetTalkResponse> = async (req, res) => {
   const myId = req.query["myId"] as string;
@@ -82,10 +94,12 @@ const handlePost: NextApiHandler<PostTalkResponse> = async (req, res) => {
   const reqData: PostTalkRequest = req.body;
 
   const created = Date.now();
-  const newTalk: Talk = {
+
+  const newTalk: SheetTalk = {
     ...reqData,
     id: created.toString(),
     created: created,
+    password: await hashPasword(reqData.password),
     published: false,
   };
 

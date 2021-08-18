@@ -11,14 +11,15 @@ import timeDiffFormat from "@/common/utils/timeDiffFormat";
 import useStorage from "@/common/hooks/useStorage";
 import coverPic from "@/public/photos/cover_min.jpg";
 import mapPic from "@/public/photos/map.gif";
-import { GetTalkResponse, Talk } from "../types";
+import { GetTalkResponse, Party, Talk } from "../types";
 import {
   BoxShadowStyle,
+  BubbleHeadStyle,
   Main,
   SectionHeader,
   SectionHr,
   TextSansStyle,
-} from "./index.styles";
+} from "./styles";
 import WriteTalk from "./WriteTalk";
 
 const Header = styled.h1`
@@ -235,28 +236,14 @@ const WriteButtonTrigger = styled.div`
   top: 100px;
 `;
 
-const TalkBubbleWrap = styled.div<{ party: Talk["party"] }>`
+const TalkBubbleWrap = styled.div<{ party: Party; color: string }>`
   ${TextSansStyle}
   margin-bottom: 10px;
   &:last-child {
     margin-bottom: 0;
   }
   svg {
-    ${({ party }) =>
-      party === "BRIDE"
-        ? css`
-            float: right;
-            background: #c2e0a3;
-          `
-        : css`
-            float: left;
-            background: #abdaab;
-          `}
-    width: 22px;
-    height: 22px;
-    color: white;
-    padding: 8px;
-    border-radius: 20px;
+    ${({ party, color }) => BubbleHeadStyle(party, color)}
   }
   > div {
     ${({ party }) =>
@@ -282,6 +269,7 @@ const TalkBubbleWrap = styled.div<{ party: Talk["party"] }>`
             `}
 
       p {
+        white-space: pre-wrap;
         text-align: left;
         word-break: break-all;
         overflow-wrap: break-word;
@@ -313,16 +301,20 @@ const TalkBubbleWrap = styled.div<{ party: Talk["party"] }>`
 type TalkBubbleProps = { talk: Talk };
 const TalkBubble = ({ talk }: TalkBubbleProps) => {
   return (
-    <TalkBubbleWrap party={talk.party}>
+    <TalkBubbleWrap party={talk.party} color={talk.color}>
       {talk.party === "BRIDE" ? <EmojiLookLeft /> : <EmojiLookRight />}
       <div>
         {talk.author}
         <div className="hi">
           <p>{talk.msg}</p>
           <small>
-            {!talk.published
-              ? "심사중"
-              : timeDiffFormat(new Date(talk.created))}
+            {!talk.published && (
+              <>
+                심사중
+                <br />
+              </>
+            )}
+            {timeDiffFormat(new Date(talk.created))}
           </small>
         </div>
       </div>
