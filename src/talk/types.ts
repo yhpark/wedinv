@@ -31,7 +31,7 @@ export type PatchTalkRequest = {
   msg: string;
   password: string;
 };
-export type PatchTalkResponse = {};
+export type PatchTalkResponse = { error?: string };
 
 export type DeleteTalkRequest = {
   /* TODO */

@@ -1,6 +1,12 @@
 import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
@@ -21,6 +27,7 @@ import {
   TextSansStyle,
 } from "./styles";
 import WriteTalk from "./talk/WriteTalk";
+import EditTalk from "./talk/EditTalk";
 
 const Header = styled.h1`
   display: inline-block;
@@ -236,7 +243,11 @@ const WriteButtonTrigger = styled.div`
   top: 100px;
 `;
 
-const TalkBubbleWrap = styled.div<{ party: Party; color: string }>`
+const TalkBubbleWrap = styled.div<{
+  party: Party;
+  color: string;
+  selected: boolean;
+}>`
   ${TextSansStyle}
   margin-bottom: 10px;
   &:last-child {
@@ -257,7 +268,7 @@ const TalkBubbleWrap = styled.div<{ party: Party; color: string }>`
             text-align: left;
           `}
     line-height: 1.3;
-    div.hi {
+    div.bubble-info-wrap {
       display: flex;
       ${({ party }) =>
         party === "BRIDE"
@@ -287,6 +298,11 @@ const TalkBubbleWrap = styled.div<{ party: Party; color: string }>`
                 margin-right: 3px;
               `}
         background: #eee;
+        ${({ selected }) =>
+          selected &&
+          css`
+            background: #ddd;
+          `}
       }
       small {
         align-self: flex-end;
@@ -295,26 +311,54 @@ const TalkBubbleWrap = styled.div<{ party: Party; color: string }>`
         font-size: 11px;
       }
     }
+    .edit {
+      font-size: 0.9em;
+      color: #999;
+      text-decoration: underline;
+    }
   }
 `;
 
-type TalkBubbleProps = { talk: Talk };
-const TalkBubble = ({ talk }: TalkBubbleProps) => {
+type TalkBubbleProps = {
+  talk: Talk;
+  selected: boolean;
+  onBubbleClick: (id: string | undefined) => void;
+  onEditClick: (id: string) => void;
+};
+const TalkBubble = ({
+  talk,
+  selected,
+  onBubbleClick,
+  onEditClick,
+}: TalkBubbleProps) => {
+  const handleBubbleClick: MouseEventHandler = (e) => {
+    e.stopPropagation();
+    onBubbleClick(talk.id);
+  };
+  const handleBubbleOutsideClick: MouseEventHandler = (e) =>
+    onBubbleClick(undefined);
+  const handleEditClick: MouseEventHandler = (e) => {
+    e.stopPropagation();
+    onEditClick(talk.id);
+  };
+  const editBtn = (
+    <span className="edit" onClick={handleEditClick}>
+      수정하기
+    </span>
+  );
   return (
-    <TalkBubbleWrap party={talk.party} color={talk.color}>
+    <TalkBubbleWrap party={talk.party} color={talk.color} selected={selected}>
       {talk.party === "BRIDE" ? <EmojiLookLeft /> : <EmojiLookRight />}
-      <div>
+      <div onClick={handleBubbleOutsideClick}>
+        {selected && talk.party === "BRIDE" && <>{editBtn} </>}
         {talk.author}
-        <div className="hi">
-          <p>{talk.msg}</p>
+        {selected && talk.party === "GROOM" && <> {editBtn}</>}
+        <div className="bubble-info-wrap">
+          <p onClick={handleBubbleClick}>{talk.msg}</p>
           <small>
-            {!talk.published && (
-              <>
-                심사중
-                <br />
-              </>
-            )}
-            {timeDiffFormat(new Date(talk.created))}
+            {!talk.published
+              ? "검수중"
+              : timeDiffFormat(new Date(talk.created))}
           </small>
         </div>
       </div>
@@ -329,15 +373,19 @@ const ThankYou = styled.div`
 
 const Home = () => {
   const [writeTalkId, setWriteTalkId] = useStorage("talk.write.id");
-  const { data, error } = useSWR<GetTalkListResponse>(
-    `/api/talk/list?myId=${writeTalkId || ""}`
-  );
+  const {
+    data: talkListResp,
+    error,
+    mutate,
+  } = useSWR<GetTalkListResponse>(`/api/talk/list?myId=${writeTalkId || ""}`);
 
-  const [isGalleryModalShown, setGalleryModalShown] = useState(false);
-  const [isWriteModalShown, setWriteModalShown] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [showWriteTalkModal, setShowWriteTalkModal] = useState(false);
+  const [showEditTalkModal, setShowEditTalkModal] = useState<Talk>();
   const [isWriteButtonShown, setWriteButtonShown] = useState(false);
   const [lastClickedGalleryItem, setLastClickedGalleryItem] =
     useState<number>();
+  const [selectedTalkId, setSelectedTalkId] = useState<string>();
 
   const sliderRef = useRef<Slider>(null);
   const writeButtonTriggerRef = useRef<HTMLDivElement>(null);
@@ -356,19 +404,34 @@ const Home = () => {
 
   const handlePhotoClick = (i: number) => {
     setLastClickedGalleryItem(i);
-    setGalleryModalShown(true);
+    setShowGalleryModal(true);
   };
 
-  const handleGalleryModalClose = () => setGalleryModalShown(false);
+  const handleGalleryModalClose = () => setShowGalleryModal(false);
 
-  const handleWriteButtonClick = () => setWriteModalShown(true);
+  const handleTalkBubbleClick = (id: string | undefined) =>
+    setSelectedTalkId(id);
 
-  const handleWriteModalClose = () => setWriteModalShown(false);
-
-  const handleWrite = (id: string) => {
+  const handleWriteButtonClick = () => setShowWriteTalkModal(true);
+  const handleWriteTalk = (id: string) => {
     setWriteTalkId(id);
-    setWriteModalShown(false);
+    setShowWriteTalkModal(false);
+    mutate();
   };
+  const handleWriteTalkModalClose = () => setShowWriteTalkModal(false);
+
+  const handleTalkEditClick = (id: string) => {
+    const talk = talkListResp?.talks?.find((t) => t.id === id);
+    if (!talk) return;
+    setShowEditTalkModal(talk);
+    setSelectedTalkId(undefined);
+  };
+  const handleEditTalk = (id: string) => {
+    setWriteTalkId(id);
+    setShowEditTalkModal(undefined);
+    mutate();
+  };
+  const handleEditTalkModalClose = () => setShowEditTalkModal(undefined);
 
   return (
     <Main>
@@ -435,7 +498,7 @@ const Home = () => {
           </li>
         ))}
       </WeddingPhotoGallery>
-      {isGalleryModalShown && (
+      {showGalleryModal && (
         <Modal handleClose={handleGalleryModalClose}>
           <SliderWrap onClick={handleGalleryModalClose}>
             <Slider
@@ -493,8 +556,14 @@ const Home = () => {
       <div style={{ clear: "both" }} />
       <TalkWrap>
         <WriteButtonTrigger ref={writeButtonTriggerRef} />
-        {data?.talks.map((talk, idx) => (
-          <TalkBubble key={idx} talk={talk} />
+        {talkListResp?.talks.map((talk, idx) => (
+          <TalkBubble
+            key={idx}
+            talk={talk}
+            selected={talk.id == selectedTalkId}
+            onBubbleClick={handleTalkBubbleClick}
+            onEditClick={handleTalkEditClick}
+          />
         ))}
       </TalkWrap>
       <ThankYou>{writeTalkId ? "감사합니다." : ""}</ThankYou>
@@ -506,9 +575,14 @@ const Home = () => {
           😍 나도 한마디
         </WriteButton>
       )}
-      {isWriteModalShown && (
-        <Modal handleClose={handleWriteModalClose}>
-          <WriteTalk onWrite={handleWrite} />
+      {showWriteTalkModal && (
+        <Modal handleClose={handleWriteTalkModalClose}>
+          <WriteTalk onWrite={handleWriteTalk} />
+        </Modal>
+      )}
+      {showEditTalkModal && (
+        <Modal handleClose={handleEditTalkModalClose}>
+          <EditTalk talk={showEditTalkModal} onEdit={handleEditTalk} />
         </Modal>
       )}
     </Main>

@@ -2254,6 +2254,11 @@ lodash@^4.17.11, lodash@^4.17.20:
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
+logrocket@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/logrocket/-/logrocket-2.0.0.tgz#331065873429cf70fb7cf84b676900baf9988a4e"
+  integrity sha512-O+YdrtpQn7oOmrxCqOyUcaB1+ONrhyJuB9CX57PQ0JJzNrYstxd0Oyg6UdLisA7UjNmwTr6fixMO3WOysDTFFA==
+
 loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz"

@@ -112,6 +112,9 @@ const WriteTalk = ({ onWrite }: Props) => {
       const { id } = (await resp.json()) as PostTalkResponse;
 
       onWrite(id);
+
+      setStoredAuthor("");
+      setStoredMsg("");
     } finally {
       setLoading(false);
     }
@@ -142,10 +145,10 @@ const WriteTalk = ({ onWrite }: Props) => {
             <input
               {...register("party", { required: true })}
               type="radio"
-              value="BROOM"
-              id="broom"
+              value="GROOM"
+              id="groom"
             />
-            <PartyLabel htmlFor="broom">🤵🏻‍♂️ 신랑측</PartyLabel>
+            <PartyLabel htmlFor="groom">🤵🏻‍♂️ 신랑측</PartyLabel>
             <input
               {...register("party", { required: true })}
               type="radio"

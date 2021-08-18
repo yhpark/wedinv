@@ -15,7 +15,7 @@ const handler: NextApiHandler = async (req, res) => {
   if (req.method === "GET") {
     return handleGet(req, res);
   }
-  res.status(400);
+  res.status(404).end();
 };
 
 export default handler;

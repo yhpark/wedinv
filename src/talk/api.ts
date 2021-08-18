@@ -10,6 +10,8 @@ import {
   CheckPasswordResponse,
   GetTalkListResponse,
   Party,
+  PatchTalkRequest,
+  PatchTalkResponse,
   PostTalkRequest,
   PostTalkResponse,
   Talk,
@@ -103,6 +105,36 @@ export const postTalk = async (reqData: PostTalkRequest) => {
   await sheet.addRow(serializeTalk(newTalk));
 
   const respData: PostTalkResponse = { id: newTalk.id };
+  return respData;
+};
+
+export const patchTalk = async (reqData: PatchTalkRequest) => {
+  console.log("reqData:", reqData);
+  const sheet = await getSheet();
+
+  const rows = await sheet.getRows();
+
+  const hashedPassword = await hashPasword(reqData.password);
+  const row = rows.find(
+    (r) => r.id === reqData.id && r.password === hashedPassword
+  );
+    console.log("row:", row);
+  if (!row) {
+    const respData: PatchTalkResponse = {
+      error: "수정할 글이 없거나 암호가 틀립니다.",
+    };
+    return respData;
+  }
+
+
+  row.author = reqData.author;
+  row.color = reqData.color;
+  row.party = reqData.party;
+  row.msg = reqData.msg;
+  row.published = false;
+  await row.save();
+
+  const respData: PatchTalkResponse = {};
   return respData;
 };
 
