@@ -37,18 +37,18 @@ export default class MyDocument extends Document {
     return (
       <Html lang="ko">
         <Head>
+          {/* next.js font optimization 은 IE의 User Agent 로 요청한 응답도
+           가져오기 때문에 (getFontDefinitionFromNetwork) 전체 폰트를 다운로드하는 문제가 있음. */}
           <link
             rel="preconnect"
             href="https://fonts.googleapis.com"
             crossOrigin="anonymous"
           />
-
           <link
             rel="preload"
             href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap"
             as="style"
           />
-
           <style
             dangerouslySetInnerHTML={{
               __html: `</style>
@@ -61,7 +61,6 @@ export default class MyDocument extends Document {
                         <style>`,
             }}
           ></style>
-
           <noscript>
             <link
               rel="stylesheet"
@@ -70,8 +69,21 @@ export default class MyDocument extends Document {
             />
           </noscript>
 
-          {/* next.js font optimization 은 IE의 User Agent 로 요청한 응답도
-           가져오기 때문에 (getFontDefinitionFromNetwork) 전체 폰트를 다운로드하는 문제가 있음. */}
+          {/* Google Analytics */}
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=UA-1655798-7"
+          />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'UA-1655798-7');
+            `,
+            }}
+          />
         </Head>
         <body>
           <Main />

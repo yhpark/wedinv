@@ -12,7 +12,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       const LogRocket = (await import("logrocket")).default;
       LogRocket.init("ps9ryu/wedinv");
     })();
-  });
+  }, []);
+
   return (
     <>
       <Reset />
