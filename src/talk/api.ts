@@ -1,19 +1,19 @@
 import crypto from "node:crypto";
 import { promisify } from "node:util";
-import type { NextApiHandler } from "next";
 import {
   GoogleSpreadsheet,
   GoogleSpreadsheetRow,
   GoogleSpreadsheetWorksheet,
 } from "google-spreadsheet";
 
-import type {
-  GetTalkResponse,
+import {
+  CheckPasswordResponse,
+  GetTalkListResponse,
   Party,
   PostTalkRequest,
   PostTalkResponse,
   Talk,
-} from "@/home/types";
+} from "@/talk/types";
 
 const scrypt = promisify(crypto.scrypt);
 
@@ -75,9 +75,7 @@ const serializeTalk = (talk: SheetTalk) => {
 const hashPasword = async (password: string) =>
   ((await scrypt(password, "D7zboYc4Uc", 16)) as Buffer).toString("hex");
 
-const handleGet: NextApiHandler<GetTalkResponse> = async (req, res) => {
-  const myId = req.query["myId"] as string;
-
+export const getTalkList = async (myId: string) => {
   const sheet = await getSheet();
 
   const rows = await sheet.getRows();
@@ -86,13 +84,11 @@ const handleGet: NextApiHandler<GetTalkResponse> = async (req, res) => {
 
   const visibleTalks = allTalks.filter((t) => t.published || t.id === myId);
 
-  const respData: GetTalkResponse = { talks: visibleTalks };
-  res.status(200).json(respData);
+  const respData: GetTalkListResponse = { talks: visibleTalks };
+  return respData;
 };
 
-const handlePost: NextApiHandler<PostTalkResponse> = async (req, res) => {
-  const reqData: PostTalkRequest = req.body;
-
+export const postTalk = async (reqData: PostTalkRequest) => {
   const created = Date.now();
 
   const newTalk: SheetTalk = {
@@ -107,16 +103,17 @@ const handlePost: NextApiHandler<PostTalkResponse> = async (req, res) => {
   await sheet.addRow(serializeTalk(newTalk));
 
   const respData: PostTalkResponse = { id: newTalk.id };
-  res.status(200).json(respData);
+  return respData;
 };
 
-const handler: NextApiHandler = async (req, res) => {
-  if (req.method === "GET") {
-    return handleGet(req, res);
-  } else if (req.method === "POST") {
-    return handlePost(req, res);
-  }
-  res.status(400);
-};
+export const checkPassword = async (id: string, password: string) => {
+  const sheet = await getSheet();
 
-export default handler;
+  const rows = await sheet.getRows();
+
+  const hashedPassword = await hashPasword(password);
+  const row = rows.find((r) => r.id === id && r.password === hashedPassword);
+
+  const respData: CheckPasswordResponse = { check: !!row };
+  return respData;
+};

@@ -6,12 +6,12 @@ import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
 import useSWR from "swr";
 
-import Modal from "@/common/components/Modal";
+import Modal from "@/components/common/Modal";
 import timeDiffFormat from "@/common/utils/timeDiffFormat";
 import useStorage from "@/common/hooks/useStorage";
 import coverPic from "@/public/photos/cover_min.jpg";
 import mapPic from "@/public/photos/map.gif";
-import { GetTalkResponse, Party, Talk } from "../types";
+import { GetTalkListResponse, Party, Talk } from "@/talk/types";
 import {
   BoxShadowStyle,
   BubbleHeadStyle,
@@ -20,7 +20,7 @@ import {
   SectionHr,
   TextSansStyle,
 } from "./styles";
-import WriteTalk from "./WriteTalk";
+import WriteTalk from "./talk/WriteTalk";
 
 const Header = styled.h1`
   display: inline-block;
@@ -329,8 +329,8 @@ const ThankYou = styled.div`
 
 const Home = () => {
   const [writeTalkId, setWriteTalkId] = useStorage("talk.write.id");
-  const { data, error } = useSWR<GetTalkResponse>(
-    `/api/talk?myId=${writeTalkId || ""}`
+  const { data, error } = useSWR<GetTalkListResponse>(
+    `/api/talk/list?myId=${writeTalkId || ""}`
   );
 
   const [isGalleryModalShown, setGalleryModalShown] = useState(false);
@@ -424,6 +424,7 @@ const Home = () => {
       <WeddingPhotoGallery>
         {Array.from(Array(14), (_, i) => i).map((i) => (
           <li key={i}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               role="button"
               src={`/photos/p${i + 1}.jpeg`}
@@ -447,6 +448,7 @@ const Home = () => {
             >
               {Array.from(Array(14), (_, i) => i + 1).map((i) => (
                 <div key={i}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={`/photos/p${i}.jpeg`} alt="" />
                 </div>
               ))}

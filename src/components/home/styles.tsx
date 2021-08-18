@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { Party } from "../types";
+import { Party } from "@/talk/types";
 
 export const TextSerifStyle = css`
   font-family: "Noto Serif KR", serif;

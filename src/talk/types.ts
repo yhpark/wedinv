@@ -10,6 +10,8 @@ export type Talk = {
   published: boolean;
 };
 
+export type GetTalkListResponse = { talks: Talk[] };
+
 export type PostTalkRequest = {
   author: string;
   color: string;
@@ -19,4 +21,18 @@ export type PostTalkRequest = {
 };
 export type PostTalkResponse = { id: string };
 
-export type GetTalkResponse = { talks: Talk[] };
+export type CheckPasswordResponse = { check: boolean };
+
+export type PatchTalkRequest = {
+  id: string;
+  author: string;
+  color: string;
+  party: Party;
+  msg: string;
+  password: string;
+};
+export type PatchTalkResponse = {};
+
+export type DeleteTalkRequest = {
+  /* TODO */
+};
