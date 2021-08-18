@@ -1,5 +1,5 @@
-import crypto from "node:crypto";
-import { promisify } from "node:util";
+import crypto from "crypto";
+import { promisify } from "util";
 import {
   GoogleSpreadsheet,
   GoogleSpreadsheetRow,
