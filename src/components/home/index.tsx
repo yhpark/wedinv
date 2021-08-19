@@ -556,11 +556,11 @@ const Home = () => {
       <div style={{ clear: "both" }} />
       <TalkWrap>
         <WriteButtonTrigger ref={writeButtonTriggerRef} />
-        {talkListResp?.talks.map((talk, idx) => (
+        {talkListResp?.talks.map(talk => (
           <TalkBubble
-            key={idx}
+            key={talk.id}
             talk={talk}
-            selected={talk.id == selectedTalkId}
+            selected={talk.id === selectedTalkId}
             onBubbleClick={handleTalkBubbleClick}
             onEditClick={handleTalkEditClick}
           />
