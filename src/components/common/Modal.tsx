@@ -13,6 +13,7 @@ const ModalWrap = styled.div`
   justify-content: center;
   overflow: auto; /* Enable scroll if needed */
   background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+  backdrop-filter: blur(10px);
 `;
 
 const ModalContent = styled.div`
