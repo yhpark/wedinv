@@ -1,4 +1,4 @@
-import useStorage from "@/common/hooks/useStorage";
+import { useSessionStorage } from "@/common/hooks/useStorage";
 import randomInt from "@/common/utils/randomInt";
 import { EmojiLookLeft, EmojiLookRight } from "iconoir-react";
 import React, {
@@ -46,9 +46,10 @@ const WriteTalk = ({ onWrite }: Props) => {
   const [isLoading, setLoading] = useState(false);
   const [showPasswordInput, setShowPasswordInput] = useState(false);
 
-  const [storedAuthor, setStoredAuthor] = useStorage("talk.write.cache.author");
+  const [storedAuthor, setStoredAuthor] =
+    useSessionStorage("talk.write.author");
   const [cachedAuthor] = useState(storedAuthor);
-  const [storedMsg, setStoredMsg] = useStorage("talk.write.cache.msg");
+  const [storedMsg, setStoredMsg] = useSessionStorage("talk.write.msg");
   const [cachedMsg] = useState(storedMsg);
 
   useEffect(() => {

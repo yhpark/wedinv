@@ -14,7 +14,7 @@ import useSWR from "swr";
 
 import Modal from "@/components/common/Modal";
 import timeDiffFormat from "@/common/utils/timeDiffFormat";
-import useStorage from "@/common/hooks/useStorage";
+import { useSessionStorage } from "@/common/hooks/useStorage";
 import coverPic from "@/public/photos/cover_min.jpg";
 import mapPic from "@/public/photos/map.gif";
 import { GetTalkListResponse, Party, Talk } from "@/talk/types";
@@ -372,12 +372,12 @@ const ThankYou = styled.div`
 `;
 
 const Home = () => {
-  const [writeTalkId, setWriteTalkId] = useStorage("talk.write.id");
+  const [writeDone, setWriteDone] = useSessionStorage("talk.writedone");
   const {
     data: talkListResp,
     error,
     mutate,
-  } = useSWR<GetTalkListResponse>(`/api/talk/list?myId=${writeTalkId || ""}`);
+  } = useSWR<GetTalkListResponse>("/api/talk/list");
 
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [showWriteTalkModal, setShowWriteTalkModal] = useState(false);
@@ -413,8 +413,8 @@ const Home = () => {
     setSelectedTalkId(id);
 
   const handleWriteButtonClick = () => setShowWriteTalkModal(true);
-  const handleWriteTalk = (id: string) => {
-    setWriteTalkId(id);
+  const handleWriteTalk = (_: string) => {
+    setWriteDone("done");
     setShowWriteTalkModal(false);
     mutate();
   };
@@ -426,8 +426,8 @@ const Home = () => {
     setShowEditTalkModal(talk);
     setSelectedTalkId(undefined);
   };
-  const handleEditTalk = (id: string) => {
-    setWriteTalkId(id);
+  const handleEditTalk = (_: string) => {
+    setWriteDone("done");
     setShowEditTalkModal(undefined);
     mutate();
   };
@@ -556,7 +556,7 @@ const Home = () => {
       <div style={{ clear: "both" }} />
       <TalkWrap>
         <WriteButtonTrigger ref={writeButtonTriggerRef} />
-        {talkListResp?.talks.map(talk => (
+        {talkListResp?.talks.map((talk) => (
           <TalkBubble
             key={talk.id}
             talk={talk}
@@ -566,8 +566,8 @@ const Home = () => {
           />
         ))}
       </TalkWrap>
-      <ThankYou>{writeTalkId ? "감사합니다." : ""}</ThankYou>
-      {!writeTalkId && (
+      <ThankYou>{writeDone ? "감사합니다." : ""}</ThankYou>
+      {!writeDone && (
         <WriteButton
           visible={isWriteButtonShown}
           onClick={handleWriteButtonClick}

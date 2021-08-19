@@ -1,12 +1,12 @@
 import { NextApiHandler } from "next";
 
-import { getTalkList } from "@/talk/api";
+import { COOKIE_TALK_ID, getTalkList } from "@/talk/api";
 import type { GetTalkListResponse } from "@/talk/types";
 
 const handleGet: NextApiHandler<GetTalkListResponse> = async (req, res) => {
-  const myId = req.query["myId"] as string;
+  const talkId = req.cookies[COOKIE_TALK_ID];
 
-  const respData = await getTalkList(myId);
+  const respData = await getTalkList(talkId);
 
   res.status(200).json(respData);
 };

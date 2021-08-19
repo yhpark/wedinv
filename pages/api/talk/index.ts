@@ -1,12 +1,20 @@
 import type { NextApiHandler } from "next";
 
 import type { PatchTalkRequest, PatchTalkResponse, PostTalkRequest, PostTalkResponse } from "@/talk/types";
-import { patchTalk, postTalk } from "@/talk/api";
+import { COOKIE_TALK_ID, patchTalk, postTalk } from "@/talk/api";
+import { setCookie } from "@/common/utils/cookie";
 
 const handlePost: NextApiHandler<PostTalkResponse> = async (req, res) => {
   const reqData: PostTalkRequest = req.body;
 
   const respData = await postTalk(reqData);
+
+  setCookie(res, COOKIE_TALK_ID, respData.id, {
+    path: "/",
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+  });
 
   res.status(200).json(respData);
 };

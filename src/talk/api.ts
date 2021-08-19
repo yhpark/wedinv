@@ -21,7 +21,7 @@ const scrypt = promisify(crypto.scrypt);
 
 type SheetTalk = Talk & { password: string };
 
-const TalkHeader: (keyof SheetTalk)[] = [
+const SHEET_TALK_HEADER: (keyof SheetTalk)[] = [
   "id",
   "author",
   "party",
@@ -45,7 +45,7 @@ const getSheet = async () => {
     // set header row
     await sheet.loadHeaderRow();
     if (sheet.headerValues.length === 0) {
-      await sheet.setHeaderRow(TalkHeader);
+      await sheet.setHeaderRow(SHEET_TALK_HEADER);
     }
   }
   return sheet;
@@ -77,14 +77,16 @@ const serializeTalk = (talk: SheetTalk) => {
 const hashPasword = async (password: string) =>
   ((await scrypt(password, "D7zboYc4Uc", 16)) as Buffer).toString("hex");
 
-export const getTalkList = async (myId: string) => {
+export const COOKIE_TALK_ID = "talkId";
+
+export const getTalkList = async (talkId: string) => {
   const sheet = await getSheet();
 
   const rows = await sheet.getRows();
   const allTalks = rows.map(deserializeTalk);
   allTalks.sort((a, b) => b.created - a.created);
 
-  const visibleTalks = allTalks.filter((t) => t.published || t.id === myId);
+  const visibleTalks = allTalks.filter((t) => t.published || t.id === talkId);
 
   const respData: GetTalkListResponse = { talks: visibleTalks };
   return respData;
@@ -109,7 +111,6 @@ export const postTalk = async (reqData: PostTalkRequest) => {
 };
 
 export const patchTalk = async (reqData: PatchTalkRequest) => {
-  console.log("reqData:", reqData);
   const sheet = await getSheet();
 
   const rows = await sheet.getRows();
@@ -118,14 +119,12 @@ export const patchTalk = async (reqData: PatchTalkRequest) => {
   const row = rows.find(
     (r) => r.id === reqData.id && r.password === hashedPassword
   );
-    console.log("row:", row);
   if (!row) {
     const respData: PatchTalkResponse = {
       error: "수정할 글이 없거나 암호가 틀립니다.",
     };
     return respData;
   }
-
 
   row.author = reqData.author;
   row.color = reqData.color;
