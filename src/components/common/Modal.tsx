@@ -19,7 +19,7 @@ const ModalWrap = styled.div`
 const ModalContent = styled.div`
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
 `;
 

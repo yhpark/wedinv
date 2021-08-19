@@ -2909,6 +2909,11 @@ react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-quick-pinch-zoom@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/react-quick-pinch-zoom/-/react-quick-pinch-zoom-4.0.2.tgz#40dd4a0c4d78445555b68e176d68a6f094207536"
+  integrity sha512-gXAhixVJxarRqRqx+UqPKVPBNCDDczVPbIXMxmEyOKr8Tc+BDLuOTADwMk6rqasd2fuji4/NSbYbBQn9pO+4WA==
+
 react-refresh@0.8.3:
   version "0.8.3"
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.8.3.tgz"

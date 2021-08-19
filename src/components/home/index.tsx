@@ -28,6 +28,7 @@ import {
 } from "./styles";
 import WriteTalk from "./talk/WriteTalk";
 import EditTalk from "./talk/EditTalk";
+import QuickPinchZoom, { make3dTransformValue } from "react-quick-pinch-zoom";
 
 const Header = styled.h1`
   display: inline-block;
@@ -100,7 +101,7 @@ const CallButton = ({ icon, bgColor, label }: CallButtonProps) => (
   </>
 );
 
-const WeddingPhotoGallery = styled.ul`
+const PhotoGrid = styled.ul`
   display: flex;
   flex-wrap: wrap;
   padding: 0 10px;
@@ -119,12 +120,29 @@ const WeddingPhotoGallery = styled.ul`
   }
 `;
 
-const SliderWrap = styled.div`
+const SliderWrap = styled.div<{ isZoomed: boolean }>`
+  height: 100%;
+  ${({ isZoomed }) =>
+    isZoomed &&
+    css`
+      * {
+        overflow: visible !important;
+      }
+    `}
   .slick-track {
     display: flex;
   }
   .slick-track .slick-slide {
     display: flex;
+
+    ${({ isZoomed }) =>
+      isZoomed &&
+      css`
+        &:not(.slick-active) {
+          visibility: hidden;
+        }
+      `}
+
     height: auto;
     align-items: center;
     justify-content: center;
@@ -136,6 +154,50 @@ const SliderWrap = styled.div`
     }
   }
 `;
+
+type PinchPhotoProps = { src: string; onZoom: (isZoomed: boolean) => void };
+const PinchPhoto = ({ src, onZoom }: PinchPhotoProps) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const pz = useRef<QuickPinchZoom>(null);
+  const handleUpdate = useCallback(
+    ({ x, y, scale }) => {
+      if (!imgRef.current) return;
+      const value = make3dTransformValue({ x, y, scale });
+      imgRef.current.style.setProperty("transform", value);
+      onZoom(scale > 1);
+    },
+    [onZoom]
+  );
+
+  return (
+    <QuickPinchZoom ref={pz} onUpdate={handleUpdate} draggableUnZoomed={false}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img ref={imgRef} src={src} alt="" />
+    </QuickPinchZoom>
+  );
+};
+
+type PhotoGalleryProps = { initialSlide?: number; onClose: () => void };
+const PhotoGallery = ({ initialSlide, onClose }: PhotoGalleryProps) => {
+  const [isZoomed, setZoomed] = useState(false);
+  return (
+    <SliderWrap isZoomed={isZoomed} onClick={onClose}>
+      <Slider
+        initialSlide={initialSlide || 0}
+        slidesToShow={1}
+        slidesToScroll={1}
+        arrows={false}
+        dots={false}
+      >
+        {Array.from(Array(14), (_, i) => i + 1).map((i) => (
+          <div key={i}>
+            <PinchPhoto onZoom={setZoomed} src={`/photos/p${i}.jpeg`} />
+          </div>
+        ))}
+      </Slider>
+    </SliderWrap>
+  );
+};
 
 const MapButton = styled.a`
   ${TextSansStyle}
@@ -241,6 +303,7 @@ const TalkWrap = styled.div`
 const WriteButtonTrigger = styled.div`
   position: absolute;
   top: 100px;
+  height: 100%;
 `;
 
 const TalkBubbleWrap = styled.div<{
@@ -387,7 +450,6 @@ const Home = () => {
     useState<number>();
   const [selectedTalkId, setSelectedTalkId] = useState<string>();
 
-  const sliderRef = useRef<Slider>(null);
   const writeButtonTriggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -484,7 +546,7 @@ const Home = () => {
         </a>
       </CallWrap>
       <SectionHr />
-      <WeddingPhotoGallery>
+      <PhotoGrid>
         {Array.from(Array(14), (_, i) => i).map((i) => (
           <li key={i}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -497,26 +559,13 @@ const Home = () => {
             />
           </li>
         ))}
-      </WeddingPhotoGallery>
+      </PhotoGrid>
       {showGalleryModal && (
         <Modal handleClose={handleGalleryModalClose}>
-          <SliderWrap onClick={handleGalleryModalClose}>
-            <Slider
-              initialSlide={lastClickedGalleryItem}
-              slidesToShow={1}
-              slidesToScroll={1}
-              arrows={false}
-              dots={false}
-              ref={sliderRef}
-            >
-              {Array.from(Array(14), (_, i) => i + 1).map((i) => (
-                <div key={i}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={`/photos/p${i}.jpeg`} alt="" />
-                </div>
-              ))}
-            </Slider>
-          </SliderWrap>
+          <PhotoGallery
+            initialSlide={lastClickedGalleryItem}
+            onClose={handleGalleryModalClose}
+          />
         </Modal>
       )}
       <SectionHr />
