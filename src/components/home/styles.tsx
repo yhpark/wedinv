@@ -71,8 +71,8 @@ export const BubbleHeadStyle = (party: Party, color: string) => css`
         float: left;
       `}
   background: ${color};
-  width: 22px;
-  height: 22px;
+  width: 38px;
+  height: 38px;
   color: white;
   padding: 8px;
   border-radius: 20px;

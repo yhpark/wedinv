@@ -29,9 +29,11 @@ export const BubbleStyle = (party: Party) => css`
 
 export const Wrap = styled.div`
   position: relative;
+  width: calc(100% - 40px);
+  max-width: 400px;
   padding: 20px;
   border-radius: 30px;
-  margin: 0 20px;
+  margin: 0 auto;
   overflow: hidden;
 
   background: white;
@@ -153,8 +155,8 @@ export const MsgInput = styled.div<{ party: Party }>`
 
 export const PasswordWrap = styled.div`
   text-align: center;
-  marg label {
-    color: #666;
+  label {
+    display: block;
   }
 `;
 export const PasswordInput = styled.input`

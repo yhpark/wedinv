@@ -77,8 +77,8 @@ const CallButtonWrap = styled.div<{ bgColor: string }>`
     display: block;
     margin: 0 auto;
     margin-bottom: 4px;
-    width: 30px;
-    height: 30px;
+    width: 60px;
+    height: 60px;
     color: white;
     padding: 15px;
     border-radius: 30px;
@@ -232,11 +232,11 @@ const CopyTextButton = styled.button`
   background: none;
 
   svg {
-    width: 18px;
-    height: 18px;
-    padding: 0 4px;
+    width: 20px;
+    height: 20px;
+    padding: 2px;
     color: #999;
-    vertical-align: text-bottom;
+    vertical-align: sub;
   }
 `;
 const CopyText = ({ text }: { text: string }) => {
