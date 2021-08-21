@@ -240,7 +240,21 @@ const CopyTextButton = styled.button`
   }
 `;
 const CopyText = ({ text }: { text: string }) => {
-  const handleCopyText = () => navigator.clipboard.writeText(text);
+  const handleCopyText = () => {
+    const fallbackCopyClipboard = (value: string) => {
+      const $text = document.createElement("textarea");
+      document.body.appendChild($text);
+      $text.value = value;
+      $text.select();
+      document.execCommand("copy");
+      document.body.removeChild($text);
+    };
+
+    navigator.clipboard
+      .writeText(text)
+      .catch(() => fallbackCopyClipboard(text))
+      .then(() => alert("계좌번호가 복사 되었습니다."));
+  };
   return (
     <>
       {text}
