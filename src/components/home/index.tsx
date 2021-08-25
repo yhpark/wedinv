@@ -602,7 +602,7 @@ const Home = () => {
         <p>
           <strong>신랑측</strong> (박영훈)
           <br />
-          <CopyText text="국민은행 867701-04-035141" />
+          <CopyText text="카카오뱅크 3333-07-0052253" />
         </p>
         <p>
           <strong>신부측</strong> (김현주)
