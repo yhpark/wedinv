@@ -1,5 +1,6 @@
 import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, {
   MouseEventHandler,
   useCallback,
@@ -53,6 +54,31 @@ const CoverPicWrap = styled.div`
   border-radius: 30px;
   overflow: hidden;
   line-height: 0;
+`;
+
+const LiveButton = styled.button`
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  margin: 12px 10px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  background: rgba(255, 136, 170);
+
+  animation: color-change 1s infinite;
+
+  @keyframes color-change {
+    0% {
+      background: rgba(255, 136, 170, 0.7);
+    }
+    50% {
+      background: rgb(255, 136, 170);
+    }
+    100% {
+      background: rgba(255, 136, 170, 0.7);
+    }
+  }
 `;
 
 const GreetingP = styled.p`
@@ -524,6 +550,9 @@ const Home = () => {
         <br />
         반포 JW 메리어트 호텔 5층 그랜드볼룸
       </p>
+      <Link href="/live" passHref>
+        <LiveButton>📹 결혼식 생중계 보러가기</LiveButton>
+      </Link>
       <SectionHr />
 
       <SectionHeader>결혼합니다.</SectionHeader>
