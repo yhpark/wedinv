@@ -1,4 +1,5 @@
 import Live from "@/components/home/live";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 
 const LivePage = () => {
@@ -28,3 +29,31 @@ const LivePage = () => {
 };
 
 export default LivePage;
+
+let liveUrlCache = { url: "", when: 0 };
+const getLiveUrl = async () => {
+  if (liveUrlCache.when < Date.now() - 10000) {
+    const liveUrl = await fetch(
+      "https://docs.google.com/document/export?format=txt&id=1nTE3m6M9WOqPU8vPUNemJhyQUCdvujM9MAVWsjn4H-g"
+    )
+      .then((r) => r.text())
+      .then((url) => url.trim());
+    liveUrlCache = { url: liveUrl, when: Date.now() };
+  }
+  return liveUrlCache.url;
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const liveUrl = await getLiveUrl();
+  if (liveUrl.startsWith("http")) {
+    return {
+      redirect: {
+        destination: liveUrl,
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};
