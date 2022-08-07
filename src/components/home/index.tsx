@@ -637,9 +637,11 @@ const Home = () => {
       <SectionHeader>💸 마음 전하실 곳</SectionHeader>
       <GiveWrap>
         <p>
-          <strong>신랑측</strong> 
+          <strong>신랑측</strong>
           <br />
           <CopyText text="우리은행 1002-743-212772 (이준영)" />
+          <CopyText text="농협 453034-52-042891 (김혜숙)" />
+
         </p>
         <p>
           <strong>신부측</strong>

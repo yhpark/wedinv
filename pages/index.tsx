@@ -3,8 +3,6 @@ import React from "react";
 
 import Home from "@/components/home";
 
-import thumbnailPic from "@/public/photos/thumbnail.jpeg";
-
 const HomePage = () => {
   return (
     <>
@@ -26,7 +24,7 @@ const HomePage = () => {
         />
         <meta
           property="og:image"
-          content={thumbnailPic}
+          content="https://minha-joonyoung-wedding.vercel.app/photos/p18.jpeg"
         />
       </Head>
       <Home />
