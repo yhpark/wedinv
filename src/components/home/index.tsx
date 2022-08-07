@@ -87,6 +87,14 @@ const GreetingP = styled.p`
   margin: 30px 0;
 `;
 
+const EventP = styled.p`
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 0;
+  line-height: 150%;
+  font-size: 14px;
+`;
+
 const CallWrap = styled.div`
   display: flex;
   flex-direction: row;
@@ -641,7 +649,7 @@ const Home = () => {
         </Modal>
       )}
       <SectionHr />
-      <SectionHeader>오시는 길</SectionHeader>
+      <SectionHeader>🧭 오시는 길</SectionHeader>
       <Image src={mapPic} width="400px" height="270px" alt="" />
       <p>
         서울 강남구 학동로 519
@@ -675,19 +683,20 @@ const Home = () => {
       <SectionHr />
 
       <SectionHeader>👰 결혼식 이벤트</SectionHeader>
-      <GreetingP>
-        저희 부부가 결혼식에서 소소한 소개팅 이벤트를 준비했습니다.
-        <br />
-        매치그룹에 다니는 예비 신랑이 만든 알고리즘(?!)으로 이뤄지는
-        <br />
-        AI를 가장한 아날로그 소개팅! 많관부 🙈
-        <br />
+      <EventP>
+        <p>
+          저희 부부가 결혼식 당일에 <br/>
+          소소한 소개팅 이벤트를 준비했습니다. <br/>
+          매치그룹에 다니는 예비 신랑이 만든 <br/>
+          알고리즘(?!)으로 이뤄지는 <br/>
+          AI를 가장한 아날로그 소개팅! 많관부 🙈
+        </p>
 
         <Button href="https://yearnning.typeform.com/to/XxHWkVSG">
           <Heart color="#E1AFAE" /> 신청하러 가기
         </Button>
 
-      </GreetingP>
+      </EventP>
 
       <SectionHr />
       <SectionHeader>축하의 한마디</SectionHeader>
