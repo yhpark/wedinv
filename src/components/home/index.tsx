@@ -17,7 +17,7 @@ import Modal from "@/components/common/Modal";
 import timeDiffFormat from "@/common/utils/timeDiffFormat";
 import { useSessionStorage } from "@/common/hooks/useStorage";
 import coverPic from "@/public/photos/cover_min.jpg";
-import mapPic from "@/public/photos/map.gif";
+import mapPic from "@/public/photos/map.jpeg";
 import { GetTalkListResponse, Party, Talk } from "@/talk/types";
 import {
   BoxShadowStyle,
@@ -538,49 +538,55 @@ const Home = () => {
   return (
     <Main>
       <Header>
-        박영훈
+        이준영
         <hr />
-        김현주
+        김민하
       </Header>
       <CoverPicWrap>
         <Image src={coverPic} priority={true} placeholder="blur" alt="" />
       </CoverPicWrap>
       <p>
-        2021년 10월 3일 일요일 오후 1시
+        2022년 9월 25일 일요일 오후 3시
         <br />
-        반포 JW 메리어트 호텔 5층 그랜드볼룸
+        빌라드지디 청담
       </p>
-      <Link href="/live" passHref>
-        <LiveButton>📹 결혼식 생중계 보러가기</LiveButton>
-      </Link>
+
+
       <SectionHr />
 
-      <SectionHeader>결혼합니다.</SectionHeader>
+      <SectionHeader>아름다운 날. <br/>소중한 분을 초대합니다.</SectionHeader>
       <GreetingP>
-        청명한 가을날
+        벚꽃엔딩이 온 거리에 울려 퍼지던 때
         <br />
-        새로이 시작하는 작은 사랑이
+        처음 만났습니다.
         <br />
-        보다 크고 깊은 사랑이 되려고 합니다.
+        그리고, 함께했던 지난 10년은
         <br />
-        함께 자리하시어 축복해 주시면
+        더없이 행복했습니다.
         <br />
-        더없는 기쁨이겠습니다.
+        <br />
+        이제 그 행복을 더 가까이서
+        <br />
+        함께하려 합니다.
+        <br />
+        저희의 시작하는 모습을
+        <br />
+        여러분과 함께하고 싶습니다.
       </GreetingP>
       <GreetingP>
-        김종오 · 강경자의 장녀 현주
+        김승수 · 황승미의 장녀 민하
         <br />
-        박민양 · 최승현의 차남 영훈
+        (故)이상인 · 김혜숙의 장남 준영
       </GreetingP>
       <CallWrap>
-        <a href="tel:01071056849">
+        <a href="tel:01097650885">
           <CallButton
             icon={<EmojiLookRight />}
             bgColor="#abdaab"
             label="신랑측에 연락하기"
           />
         </a>
-        <a href="tel:01073692869">
+        <a href="tel:01062350221">
           <CallButton
             icon={<EmojiLookLeft />}
             bgColor="#c2e0a3"
@@ -590,7 +596,7 @@ const Home = () => {
       </CallWrap>
       <SectionHr />
       <PhotoGrid>
-        {Array.from(Array(14), (_, i) => i).map((i) => (
+        {Array.from(Array(15), (_, i) => i).map((i) => (
           <li key={i}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -613,30 +619,30 @@ const Home = () => {
       )}
       <SectionHr />
       <SectionHeader>오시는 길</SectionHeader>
-      <Image src={mapPic} width="400px" alt="" />
+      <Image src={mapPic} width="400px" height="270px" alt="" />
       <p>
-        서울 서초구 신반포로 176
+        서울 강남구 학동로 519
         <br />
-        반포 JW 메리어트 호텔 5층 그랜드볼룸
+        빌라드지디 청담
       </p>
-      <MapButton href="https://place.map.kakao.com/8005133">
+      <MapButton href="https://place.map.kakao.com/1417946142">
         <PinAlt color="#1199EE" /> 카카오맵
       </MapButton>
-      <MapButton href="https://map.naver.com/v5/entry/place/11583195">
+      <MapButton href="https://naver.me/xM28SuGC">
         <PinAlt color="#66BB66" /> 네이버지도
       </MapButton>
       <SectionHr />
       <SectionHeader>💸 마음 전하실 곳</SectionHeader>
       <GiveWrap>
         <p>
-          <strong>신랑측</strong> (박영훈)
+          <strong>신랑측</strong> (이준영)
           <br />
-          <CopyText text="카카오뱅크 3333-07-0052253" />
+          <CopyText text="우리은행 1002-743-212772" />
         </p>
         <p>
-          <strong>신부측</strong> (김현주)
+          <strong>신부측</strong> (김민하)
           <br />
-          <CopyText text="우리은행 1002-291-920831" />
+          <CopyText text="하나은행 66091094839307" />
         </p>
       </GiveWrap>
       <SectionHr />

@@ -7,24 +7,24 @@ const HomePage = () => {
   return (
     <>
       <Head>
-        <title>박영훈 ♡ 김현주</title>
+        <title>이준영 ♡ 김민하</title>
         <meta
           name="description"
-          content="박영훈 ♡ 김현주 10월 3일에 결혼합니다."
+          content="이준영 ♡ 김민하 2022년 9월 25일에 결혼합니다."
         />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
         <meta property="og:type" content="article" />
-        <meta property="og:title" content="박영훈 ♡ 김현주 청첩장" />
+        <meta property="og:title" content="이준영 ♡ 김민하 청첩장" />
         <meta
           property="og:description"
-          content="10월 3일에 결혼합니다."
+          content="2022년 9월 25일에 결혼합니다."
         />
         <meta
           property="og:image"
-          content="https://drive.google.com/uc?id=1kf4TQN50LQyEybKT844g6CLq7nXeG6cl"
+          content="https://lh3.googleusercontent.com/pw/AL9nZEWuD4_R02bQF0pzeEDWy4RVBEAfOdN4JE2bU-ZN_gBE4VqlSreBhd7_6OBa2lhPDupr0T6AXJt9nJt7VBT8buMhTu7RumAKTWwTkdGQMNqp7N_LIRj0fks6-HjBZq4_l88_u_rKVLZSAYpN21R0rPlYBw=w1024-h683-no?authuser=0"
         />
       </Head>
       <Home />
