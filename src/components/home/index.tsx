@@ -56,6 +56,8 @@ const CoverPicWrap = styled.div`
   line-height: 0;
 `;
 
+const imageSize = 15;
+
 const LiveButton = styled.button`
   padding: 8px 16px;
   border: 0;
@@ -215,7 +217,7 @@ const PhotoGallery = ({ initialSlide, onClose }: PhotoGalleryProps) => {
         arrows={false}
         dots={false}
       >
-        {Array.from(Array(14), (_, i) => i + 1).map((i) => (
+        {Array.from(Array(imageSize), (_, i) => i + 1).map((i) => (
           <div key={i}>
             <PinchPhoto onZoom={setZoomed} src={`/photos/p${i}.jpeg`} />
           </div>
@@ -596,7 +598,7 @@ const Home = () => {
       </CallWrap>
       <SectionHr />
       <PhotoGrid>
-        {Array.from(Array(15), (_, i) => i).map((i) => (
+        {Array.from(Array(imageSize), (_, i) => i).map((i) => (
           <li key={i}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
