@@ -1,4 +1,4 @@
-import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
+import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt, Heart } from "iconoir-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, {
@@ -228,6 +228,27 @@ const PhotoGallery = ({ initialSlide, onClose }: PhotoGalleryProps) => {
 };
 
 const MapButton = styled.a`
+  ${TextSansStyle}
+  display: inline-block;
+  padding: 8px 16px 8px 10px;
+  border: 0;
+  border-radius: 18px;
+  margin: 0 10px;
+  color: #666;
+  font-size: 13px;
+  text-decoration: none;
+  background: #f3f3f3;
+  line-height: 1.3;
+  > svg {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: -4px 0;
+    margin-right: 4px;
+  }
+`;
+
+const Button = styled.a`
   ${TextSansStyle}
   display: inline-block;
   padding: 8px 16px 8px 10px;
@@ -640,6 +661,7 @@ const Home = () => {
           <strong>신랑측</strong>
           <br />
           <CopyText text="우리은행 1002-743-212772 (이준영)" />
+          <br />
           <CopyText text="농협 453034-52-042891 (김혜숙)" />
 
         </p>
@@ -649,6 +671,24 @@ const Home = () => {
           <CopyText text="하나은행 660-910948-39307 (김민하)" />
         </p>
       </GiveWrap>
+
+      <SectionHr />
+
+      <SectionHeader>👰 결혼식 이벤트</SectionHeader>
+      <GreetingP>
+        저희 부부가 결혼식에서 소소한 소개팅 이벤트를 준비했습니다.
+        <br />
+        매치그룹에 다니는 예비 신랑이 만든 알고리즘(?!)으로 이뤄지는
+        <br />
+        AI를 가장한 아날로그 소개팅! 많관부 🙈
+        <br />
+
+        <Button href="https://yearnning.typeform.com/to/XxHWkVSG">
+          <Heart color="#E1AFAE" /> 신청하러 가기
+        </Button>
+
+      </GreetingP>
+
       <SectionHr />
       <SectionHeader>축하의 한마디</SectionHeader>
       <WriteSectionSubHeader>
