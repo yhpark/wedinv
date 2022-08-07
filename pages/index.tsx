@@ -26,7 +26,7 @@ const HomePage = () => {
         />
         <meta
           property="og:image"
-          content="{thumbnailPic}"
+          content={thumbnailPic}
         />
       </Head>
       <Home />
