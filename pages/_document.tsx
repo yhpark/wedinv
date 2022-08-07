@@ -69,11 +69,7 @@ export default class MyDocument extends Document {
             />
           </noscript>
 
-          {/* Google Analytics */}
-          <script
-            async
-            src="https://www.googletagmanager.com/gtag/js?id=G-YG30TYCGWP"
-          />
+          
           <script
             dangerouslySetInnerHTML={{
               __html: `
