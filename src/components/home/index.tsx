@@ -690,6 +690,8 @@ const Home = () => {
           매치그룹에 다니는 예비 신랑이 만든 <br/>
           알고리즘(?!)으로 이뤄지는 <br/>
           AI를 가장한 아날로그 소개팅! 많관부 🙈
+          (소개팅은 서로만 알 수 있도록 <br/>
+            private하게 진행됩니다.)
         </p>
 
         <Button href="https://yearnning.typeform.com/to/XxHWkVSG">
