@@ -56,7 +56,7 @@ const CoverPicWrap = styled.div`
   line-height: 0;
 `;
 
-const imageSize = 15;
+const imageSize = 28;
 
 const LiveButton = styled.button`
   padding: 8px 16px;
@@ -637,14 +637,14 @@ const Home = () => {
       <SectionHeader>💸 마음 전하실 곳</SectionHeader>
       <GiveWrap>
         <p>
-          <strong>신랑측</strong> (이준영)
+          <strong>신랑측</strong> 
           <br />
-          <CopyText text="우리은행 1002-743-212772" />
+          <CopyText text="우리은행 1002-743-212772 (이준영)" />
         </p>
         <p>
-          <strong>신부측</strong> (김민하)
+          <strong>신부측</strong>
           <br />
-          <CopyText text="하나은행 66091094839307" />
+          <CopyText text="하나은행 660-910948-39307 (김민하)" />
         </p>
       </GiveWrap>
       <SectionHr />
