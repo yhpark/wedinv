@@ -677,6 +677,10 @@ const Home = () => {
           <strong>신부측</strong>
           <br />
           <CopyText text="하나은행 660-910948-39307 (김민하)" />
+          <br />
+          <CopyText text="농협 352184-60-50443 (김승수)" />
+          <br />
+          <CopyText text="농협 821153-52-63715 (황승미)" />
         </p>
       </GiveWrap>
 
