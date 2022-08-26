@@ -69,7 +69,7 @@ export const Header = styled.h3`
 
   text-align: center;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 900;
   line-height: 2;
 
   span {
@@ -185,7 +185,7 @@ export const SubmitButton = styled.input<{ isValid: boolean }>`
 
   text-align: center;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 900;
   color: white;
   background: rgb(255, 136, 170);
   outline: none;

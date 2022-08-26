@@ -43,6 +43,7 @@ export const Main = styled.main`
 
   p {
     margin-bottom: 20px;
+    font-weight: 500;
   }
 
   strong {

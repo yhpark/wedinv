@@ -36,7 +36,7 @@ const Header = styled.h1`
   margin: 40px 0;
 
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 900;
   line-height: 2.5;
 
   hr {
@@ -65,7 +65,7 @@ const LiveButton = styled.button`
   margin: 12px 10px;
   color: white;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 900;
   background: rgba(255, 136, 170);
 
   animation: color-change 1s infinite;
@@ -357,7 +357,7 @@ const WriteButton = styled.button<{ visible: boolean }>`
 
   color: white;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 900;
   background: rgba(255, 136, 170, 0.9);
 
   ${BoxShadowStyle}
