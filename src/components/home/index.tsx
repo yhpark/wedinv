@@ -569,9 +569,9 @@ const Home = () => {
   return (
     <Main>
       <Header>
-        이준영
-        <hr />
         김민하
+        <hr />
+        이준영
       </Header>
       <CoverPicWrap>
         <Image src={coverPic} priority={true} placeholder="blur" alt="" />
@@ -654,6 +654,8 @@ const Home = () => {
       <p>
         서울 강남구 학동로 519
         <br />
+        (청담역 12번 출구 바로 앞 위치)
+        <br />
         빌라드지디 청담
       </p>
       <MapButton href="https://place.map.kakao.com/1417946142">
@@ -662,6 +664,25 @@ const Home = () => {
       <MapButton href="https://naver.me/xM28SuGC">
         <PinAlt color="#66BB66" /> 네이버지도
       </MapButton>
+
+
+      <p>
+        <br/>
+        주차 이용 시간은 3시간 입니다.
+        <br />
+        발렛 서비스를 제공하나 당일 혼잡할 가능성이 있사오니
+        <br />
+        가급적 대중교통 이용 부탁드립니다.
+      </p>
+
+      <SectionHr />
+
+      <p>
+        식장의 사정으로 화한은 받지 않습니다.
+        <br />
+        좋은 마음만 감사히 받겠습니다.
+      </p>
+
       <SectionHr />
       <SectionHeader>💸 마음 전하실 곳</SectionHeader>
       <GiveWrap>
