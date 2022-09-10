@@ -665,47 +665,38 @@ const Home = () => {
         <PinAlt color="#66BB66" /> 네이버지도
       </MapButton>
 
-
-      <p>
+      <SectionHr />
+      <SectionHeader>🦮 식장 이용 안내</SectionHeader>
+      <EventP>
         <br/>
         주차 이용 시간은 3시간 입니다.
         <br />
-        발렛 서비스를 제공하나 당일 혼잡할 가능성이 있사오니
+        발렛 서비스를 제공하나 주차장 공간이 넉넉하지 않아
+        <br />
+        당일 혼잡할 가능성이 있사오니
         <br />
         가급적 대중교통 이용 부탁드립니다.
-      </p>
+      </EventP>
 
-      <SectionHr />
-
-      <p>
+      <EventP>
         식장의 사정으로 화환은 받지 않습니다.
         <br />
         좋은 마음만 감사히 받겠습니다.
-      </p>
+      </EventP>
 
-      <SectionHr />
-      <SectionHeader>💸 마음 전하실 곳</SectionHeader>
-      <GiveWrap>
-        <p>
-          <strong>신랑측</strong>
-          <br />
-          <CopyText text="우리은행 1002-743-212772 (이준영)" />
-          <br />
-          <CopyText text="농협 453034-52-042891 (김혜숙)" />
 
-        </p>
-        <p>
-          <strong>신부측</strong>
-          <br />
-          <CopyText text="하나은행 660-910948-39307 (김민하)" />
-          <br />
-          <CopyText text="농협 352184-60-50443 (김승수)" />
-          <br />
-          <CopyText text="농협 821153-52-263715 (황승미)" />
-        </p>
-      </GiveWrap>
+      <EventP>
+        식 당일 <u><a href="https://blog.naver.com/cheese_box/222176737557">인생네컷 느낌(?)의 포토부스(+방명록)</a></u>가
+        <br/>
+        2시 30분에 설치될 예정입니다.
+        <br/>
+        사진 많이 찍으시고 방명록 남겨주시면 좋을 것 같습니다!
+        <br/>
+        (인원 수 X 2장씩 인쇄되오니 한 장은 소장하세요 😊)
+      </EventP>
 
-      <SectionHr />
+
+    <SectionHr />
 
       <SectionHeader>👰 결혼식 이벤트</SectionHeader>
       <EventP>
@@ -726,6 +717,32 @@ const Home = () => {
       </EventP>
 
       <SectionHr />
+      <SectionHeader>💸 마음 전하실 곳</SectionHeader>
+      <GiveWrap>
+
+        <p>
+          <strong>신부측</strong>
+          <br />
+          <CopyText text="하나은행 660-910948-39307 (김민하)" />
+          <br />
+          <CopyText text="농협 352184-60-50443 (김승수)" />
+          <br />
+          <CopyText text="농협 821153-52-263715 (황승미)" />
+        </p>
+
+        <p>
+          <strong>신랑측</strong>
+          <br />
+          <CopyText text="우리은행 1002-743-212772 (이준영)" />
+          <br />
+          <CopyText text="농협 453034-52-042891 (김혜숙)" />
+
+        </p>
+      </GiveWrap>
+
+      <SectionHr />
+
+
       <SectionHeader>축하의 한마디</SectionHeader>
       <WriteSectionSubHeader>
         <p>신랑측</p>
