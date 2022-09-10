@@ -194,8 +194,9 @@ const Rsvp = () => {
           <form onSubmit={handleSubmit(onIdkSubmit)}>
             <RsvpButton type="submit" value="아직 모르겠어요" kind="idk"/>
           </form>
-          {isLoading && <LoadingOverlay />}
         </Wrap>
+
+        {isLoading && <LoadingOverlay />}
       </Main>
     );
   }
