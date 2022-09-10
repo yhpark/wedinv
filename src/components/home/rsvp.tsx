@@ -59,7 +59,7 @@ export const Highlight = styled.span`
   );
 `;
 
-export const SubmitButton = styled.input<{ kind: string }>`
+export const RsvpButton = styled.input<{ kind: string }>`
   display: block;
   width: 90%;
   height: 44px;
@@ -156,26 +156,17 @@ const Live = () => {
 
       <Wrap>
         <form onSubmit={handleSubmit(onYesSubmit)}>
-          <SubmitButton type="submit" value="식사합니다" kind="yes" />
+          <RsvpButton type="submit" value="식사합니다" kind="yes" />
         </form>
-        {isLoading && <LoadingOverlay />}
-      </Wrap>
 
-      <Wrap>
         <form onSubmit={handleSubmit(onNoSubmit)}>
-          <SubmitButton type="submit" value="식사하지 않습니다" kind="no" />
+          <RsvpButton type="submit" value="식사하지 않습니다" kind="no" />
         </form>
-        {isLoading && <LoadingOverlay />}
-      </Wrap>
-
-      <Wrap>
         <form onSubmit={handleSubmit(onIdkSubmit)}>
-          <SubmitButton type="submit" value="아직 모르겠어요" kind="idk"/>
+          <RsvpButton type="submit" value="아직 모르겠어요" kind="idk"/>
         </form>
         {isLoading && <LoadingOverlay />}
       </Wrap>
-
-      <br/>
 
       <LinkWrap>
         <u><Link href="/">
