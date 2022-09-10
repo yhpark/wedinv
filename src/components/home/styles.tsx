@@ -78,3 +78,32 @@ export const BubbleHeadStyle = (party: Party, color: string) => css`
   padding: 8px;
   border-radius: 20px;
 `;
+
+export const EventP = styled.p`
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 0;
+  line-height: 150%;
+  font-size: 14px;
+`;
+
+export const Button = styled.a`
+  ${TextSansStyle}
+  display: inline-block;
+  padding: 8px 16px 8px 10px;
+  border: 0;
+  border-radius: 18px;
+  margin: 0 10px;
+  color: #666;
+  font-size: 13px;
+  text-decoration: none;
+  background: #f3f3f3;
+  line-height: 1.3;
+  > svg {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: -4px 0;
+    margin-right: 4px;
+  }
+`;

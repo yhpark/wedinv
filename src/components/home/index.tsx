@@ -26,6 +26,8 @@ import {
   SectionHeader,
   SectionHr,
   TextSansStyle,
+  EventP,
+  Button,
 } from "./styles";
 import WriteTalk from "./talk/WriteTalk";
 import EditTalk from "./talk/EditTalk";
@@ -85,14 +87,6 @@ const LiveButton = styled.button`
 
 const GreetingP = styled.p`
   margin: 30px 0;
-`;
-
-const EventP = styled.p`
-  padding-left: 10px;
-  padding-right: 10px;
-  margin: 0;
-  line-height: 150%;
-  font-size: 14px;
 `;
 
 const CallWrap = styled.div`
@@ -236,27 +230,6 @@ const PhotoGallery = ({ initialSlide, onClose }: PhotoGalleryProps) => {
 };
 
 const MapButton = styled.a`
-  ${TextSansStyle}
-  display: inline-block;
-  padding: 8px 16px 8px 10px;
-  border: 0;
-  border-radius: 18px;
-  margin: 0 10px;
-  color: #666;
-  font-size: 13px;
-  text-decoration: none;
-  background: #f3f3f3;
-  line-height: 1.3;
-  > svg {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    margin: -4px 0;
-    margin-right: 4px;
-  }
-`;
-
-const Button = styled.a`
   ${TextSansStyle}
   display: inline-block;
   padding: 8px 16px 8px 10px;
@@ -686,13 +659,15 @@ const Home = () => {
 
 
       <EventP>
-        식 당일 <u><a href="https://blog.naver.com/cheese_box/222176737557">인생네컷 느낌(?)의 포토부스(+방명록)</a></u>가
+        식 당일 <u><a href="https://blog.naver.com/cheese_box/222176737557" target="_blank">인생네컷 느낌(?)의 포토부스(+방명록)</a></u>가
         <br/>
         2시 30분에 설치될 예정입니다.
         <br/>
-        사진 많이 찍으시고 방명록 남겨주시면 좋을 것 같습니다!
+        사진 편하게 찍으시고 방명록 남겨주시면 좋을 것 같습니다!
         <br/>
-        (인원 수 X 2장씩 인쇄되오니 한 장은 소장하세요 😊)
+        인원 수 X 2장씩 인쇄되오니
+        <br/>
+        한 장은 소장하실 수 있습니다 😊
       </EventP>
 
 
