@@ -100,7 +100,7 @@ const Live = () => {
   const { isValid, dirtyFields, errors } = formState;
   const [isLoading, setLoading] = useState(false);
 
-  const onSubmit = async (data, msg) => {
+  const onSubmit = async (data: FormData, msg: string) => {
     try {
       setLoading(true);
 
@@ -154,26 +154,26 @@ const Live = () => {
         식사 여부를 전달해주시면 감사하겠습니다. 💕
       </EventP>
 
-      <wrap>
+      <Wrap>
         <form onSubmit={handleSubmit(onYesSubmit)}>
           <SubmitButton type="submit" value="식사합니다" kind="yes" />
         </form>
         {isLoading && <LoadingOverlay />}
-      </wrap>
+      </Wrap>
 
-      <wrap>
+      <Wrap>
         <form onSubmit={handleSubmit(onNoSubmit)}>
           <SubmitButton type="submit" value="식사하지 않습니다" kind="no" />
         </form>
         {isLoading && <LoadingOverlay />}
-      </wrap>
+      </Wrap>
 
-      <wrap>
+      <Wrap>
         <form onSubmit={handleSubmit(onIdkSubmit)}>
           <SubmitButton type="submit" value="아직 모르겠어요" kind="idk"/>
         </form>
         {isLoading && <LoadingOverlay />}
-      </wrap>
+      </Wrap>
 
       <br/>
 

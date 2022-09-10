@@ -7,6 +7,7 @@ import {
 } from "google-spreadsheet";
 
 import {
+  Rsvp,
   PostRsvpRequest,
   PostRsvpResponse,
 } from "@/rsvp/types";
@@ -27,8 +28,9 @@ const getSheet = async () => {
   return sheet;
 };
 
+export const COOKIE_TALK_ID = "talkId";
 
-const serializeRsvp = (rsvp) => {
+const serializeRsvp = (rsvp: Rsvp) => {
   return {
     ...rsvp,
     created: new Date(rsvp.created)

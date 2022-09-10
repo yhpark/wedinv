@@ -659,7 +659,7 @@ const Home = () => {
 
 
       <EventP>
-        식 당일 <u><a href="https://blog.naver.com/cheese_box/222176737557" target="_blank">인생네컷 느낌(?)의 포토부스(+방명록)</a></u>가
+        식 당일 <u><a href="https://blog.naver.com/cheese_box/222176737557" target="_blank" rel="noreferrer">인생네컷 느낌(?)의 포토부스(+방명록)</a></u>가
         <br/>
         2시 30분에 설치될 예정입니다.
         <br/>
