@@ -94,7 +94,7 @@ export const RsvpButton = styled.input<{ kind: string }>`
 import { PostRsvpRequest, PostRsvpResponse } from "@/rsvp/types";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-const Live = () => {
+const Rsvp = () => {
   type FormData = PostRsvpRequest;
   const { register, handleSubmit, setValue, watch, formState } = useForm<FormData>();
   const { isValid, dirtyFields, errors } = formState;
@@ -177,4 +177,4 @@ const Live = () => {
   );
 };
 
-export default Live;
+export default Rsvp;

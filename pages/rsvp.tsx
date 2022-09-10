@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 
-import Live from "@/components/home/rsvp";
+import Rsvp from "@/components/home/rsvp";
 
 const RsvpPage = () => {
   return (
@@ -27,7 +27,7 @@ const RsvpPage = () => {
         content="https://minha-joonyoung-wedding.vercel.app/photos/p18.jpeg"
       />
       </Head>
-      <Live />
+      <Rsvp />
     </>
   );
 };
