@@ -11,13 +11,18 @@ const swrConfig = {
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_LOGROCKET_APPID) return;
     if (typeof window === "undefined") return;
-
-    if (window.location.hostname.indexOf("yhpark.io") < 0) return;
+    if (
+      window.location.hostname.includes("localhost") ||
+      window.location.hostname.includes("127.0.0.1")
+    ) {
+      return;
+    }
 
     (async () => {
       const LogRocket = (await import("logrocket")).default;
-      LogRocket.init("ps9ryu/wedinv");
+      LogRocket.init(process.env.NEXT_PUBLIC_LOGROCKET_APPID as string);
     })();
   }, []);
 
