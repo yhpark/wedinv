@@ -13,12 +13,16 @@ import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
 import useSWR from "swr";
 
-import Modal from "@/components/common/Modal";
-import timeDiffFormat from "@/common/utils/timeDiffFormat";
 import { useSessionStorage } from "@/common/hooks/useStorage";
+import timeDiffFormat from "@/common/utils/timeDiffFormat";
+import Modal from "@/components/common/Modal";
 import coverPic from "@/public/photos/cover_min.jpg";
 import mapPic from "@/public/photos/map.gif";
 import { GetTalkListResponse, Party, Talk } from "@/talk/types";
+import QuickPinchZoom, {
+  make3dTransformValue,
+  UpdateAction,
+} from "react-quick-pinch-zoom";
 import {
   BoxShadowStyle,
   BubbleHeadStyle,
@@ -27,9 +31,8 @@ import {
   SectionHr,
   TextSansStyle,
 } from "./styles";
-import WriteTalk from "./talk/WriteTalk";
 import EditTalk from "./talk/EditTalk";
-import QuickPinchZoom, { make3dTransformValue } from "react-quick-pinch-zoom";
+import WriteTalk from "./talk/WriteTalk";
 
 const Header = styled.h1`
   display: inline-block;
@@ -48,6 +51,7 @@ const Header = styled.h1`
 `;
 
 const CoverPicWrap = styled.div`
+  position: relative;
   width: 90%;
   margin: 0 auto;
   margin-bottom: 40px;
@@ -186,7 +190,7 @@ const PinchPhoto = ({ src, onZoom }: PinchPhotoProps) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const pz = useRef<QuickPinchZoom>(null);
   const handleUpdate = useCallback(
-    ({ x, y, scale }) => {
+    ({ x, y, scale }: UpdateAction) => {
       if (!imgRef.current) return;
       const value = make3dTransformValue({ x, y, scale });
       imgRef.current.style.setProperty("transform", value);
@@ -543,7 +547,14 @@ const Home = () => {
         김현주
       </Header>
       <CoverPicWrap>
-        <Image src={coverPic} priority={true} placeholder="blur" alt="" />
+        <Image
+          src={coverPic}
+          width={400}
+          height={534}
+          priority={true}
+          placeholder="blur"
+          alt=""
+        />
       </CoverPicWrap>
       <p>
         2021년 10월 3일 일요일 오후 1시
@@ -613,7 +624,7 @@ const Home = () => {
       )}
       <SectionHr />
       <SectionHeader>오시는 길</SectionHeader>
-      <Image src={mapPic} width="400px" alt="" />
+      <Image src={mapPic} width={400} alt="" />
       <p>
         서울 서초구 신반포로 176
         <br />

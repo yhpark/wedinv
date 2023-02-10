@@ -1,7 +1,13 @@
 import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { Reset } from "styled-reset";
+import { SWRConfig } from "swr";
 import "../global.css";
+
+const swrConfig = {
+  refreshInterval: 3000,
+  fetcher: (url: string) => fetch(url).then((res) => res.json()),
+};
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -18,7 +24,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Reset />
-      <Component {...pageProps} />
+      <SWRConfig value={swrConfig}>
+        <Component {...pageProps} />
+      </SWRConfig>
     </>
   );
 }
