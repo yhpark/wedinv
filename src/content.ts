@@ -31,9 +31,9 @@ export type ContentSpec = {
 };
 
 const myContentSpec: ContentSpec = {
-  htmlTitle: "박경훈 ♡ 최정연",
-  htmlDesc: "박경훈 ♡ 최정연 4월 15일에 결혼합니다.",
-  ogTitle: "박경훈 ♡ 최정연 청첩장",
+  htmlTitle: "박경훈 ♥ 최정연",
+  htmlDesc: "박경훈 ♥ 최정연 4월 15일에 결혼합니다.",
+  ogTitle: "박경훈 ♥ 최정연 청첩장",
   ogDesc: "4월 15일에 결혼합니다.",
   ogImageUrl:
     "https://drive.google.com/uc?id=1JI-G5k9itjrbWOKKNLIknOdNICojcMvQ",
