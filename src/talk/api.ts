@@ -44,7 +44,7 @@ const getSheet = async () => {
 
     // set header row
     await sheet.loadHeaderRow();
-    if (sheet.headerValues.length === 0) {
+    if (sheet.headerValues?.length === 0) {
       await sheet.setHeaderRow(SHEET_TALK_HEADER);
     }
   }
