@@ -70,7 +70,7 @@ const myContentSpec: ContentSpec = {
   },
   groomGive: [
     { name: "박경훈", account: "신한은행 110-436-194436" },
-    { name: "박민양", account: "국민 020-24-0051-197" },
+    { name: "박민양", account: "국민은행 020-24-0051-197" },
     { name: "최승현", account: "카카오뱅크 3333-0467-07506" },
   ],
   brideGive: [
