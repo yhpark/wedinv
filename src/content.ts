@@ -40,7 +40,7 @@ const myContentSpec: ContentSpec = {
 
   groomFullName: "박경훈",
   brideFullName: "최정연",
-  datetime: "2023년 4월 15일 일요일 낮 12시",
+  datetime: "2023년 4월 15일 토요일 낮 12시",
   venue: {
     desc: "롯데호텔 서울 2층 크리스탈볼룸",
     address: "서울 중구 을지로 30 (소공동 1번지)",
@@ -70,8 +70,8 @@ const myContentSpec: ContentSpec = {
   },
   groomGive: [
     { name: "박경훈", account: "신한은행 110-436-194436" },
-    { name: "박민양", account: "카카오뱅크 3333-0467-07506" },
-    { name: "최승현", account: "국민 020-24-0051-197" },
+    { name: "박민양", account: "국민 020-24-0051-197" },
+    { name: "최승현", account: "카카오뱅크 3333-0467-07506" },
   ],
   brideGive: [
     { name: "최정연", account: "국민은행 772002-04-272922" },

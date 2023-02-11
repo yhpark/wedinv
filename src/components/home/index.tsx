@@ -629,7 +629,12 @@ const Home = ({ content: c }: HomeProps) => {
       )}
       <SectionHr />
       <SectionHeader>오시는 길</SectionHeader>
-      <Image src={mapPic} width={400} alt="" />
+      <Image
+        src={mapPic}
+        width={400}
+        alt=""
+        style={{ filter: "grayscale(100%)" }}
+      />
       <p>
         {c.venue.address}
         <br />
