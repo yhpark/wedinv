@@ -575,8 +575,8 @@ const Home = ({ content: c }: HomeProps) => {
       <SectionHr />
 
       <SectionHeader>{c.greeting.title}</SectionHeader>
-      {c.greeting.content.map((p) => (
-        <GreetingP>
+      {c.greeting.content.map((p, i) => (
+        <GreetingP key={i}>
           {p
             .split("\n")
             .map((l) => l.trim())
