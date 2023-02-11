@@ -35,8 +35,8 @@ const myContentSpec: ContentSpec = {
   htmlDesc: "박경훈 ♡ 최정연 4월 15일에 결혼합니다.",
   ogTitle: "박경훈 ♡ 최정연 청첩장",
   ogDesc: "4월 15일에 결혼합니다.",
-  ogImageUrl: // TODO
-    "https://drive.google.com/uc?id=1kf4TQN50LQyEybKT844g6CLq7nXeG6cl",
+  ogImageUrl:
+    "https://drive.google.com/uc?id=1JI-G5k9itjrbWOKKNLIknOdNICojcMvQ",
 
   groomFullName: "박경훈",
   brideFullName: "최정연",

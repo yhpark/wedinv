@@ -23,7 +23,7 @@ import timeDiffFormat from "@/common/utils/timeDiffFormat";
 import Modal from "@/components/common/Modal";
 import { Content } from "@/content";
 import coverPic from "@/public/photos/cover_min.jpg";
-import mapPic from "@/public/photos/map.gif";
+import mapPic from "@/public/photos/map.png";
 import { GetTalkListResponse, Party, Talk } from "@/talk/types";
 import {
   BoxShadowStyle,
