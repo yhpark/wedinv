@@ -2,6 +2,7 @@ import { Copy, EmojiLookLeft, EmojiLookRight, PinAlt } from "iconoir-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, {
+  Fragment,
   MouseEventHandler,
   useCallback,
   useEffect,
@@ -647,20 +648,20 @@ const Home = ({ content: c }: HomeProps) => {
           <strong>신랑측</strong>
           <br />
           {c.groomGive.map((g) => (
-            <>
+            <Fragment key={g.account}>
               {g.name} <CopyText text={g.account} />
               <br />
-            </>
+            </Fragment>
           ))}
         </p>
         <p>
           <strong>신부측</strong>
           <br />
           {c.brideGive.map((g) => (
-            <>
+            <Fragment key={g.account}>
               {g.name} <CopyText text={g.account} />
               <br />
-            </>
+            </Fragment>
           ))}
         </p>
       </GiveWrap>

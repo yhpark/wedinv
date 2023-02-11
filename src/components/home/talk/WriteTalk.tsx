@@ -1,7 +1,6 @@
-import { useSessionStorage } from "@/common/hooks/useStorage";
 import randomInt from "@/common/utils/randomInt";
 import { EmojiLookLeft, EmojiLookRight } from "iconoir-react";
-import React, {
+import {
   FormEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
@@ -9,9 +8,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 
-import { PostTalkRequest, PostTalkResponse } from "@/talk/types";
+import { Party, PostTalkRequest, PostTalkResponse } from "@/talk/types";
 import {
   AuthorInput,
   BubbleWrap,
@@ -27,83 +25,79 @@ import {
   Wrap,
 } from "./styles";
 
-type FormData = PostTalkRequest;
+type WriteTalkProps = { onWrite: (id: string) => void };
 
-type Props = { onWrite: (id: string) => void };
-
-const WriteTalk = ({ onWrite }: Props) => {
-  const { register, handleSubmit, setValue, watch, formState } =
-    useForm<FormData>();
-  const { isValid, dirtyFields, errors } = formState;
-
-  const errMsg = Object.values(errors).flatMap((e) =>
-    e.message ? [e.message] : []
-  )[0];
-
-  const party = watch("party");
-  const color = watch("color");
-
+const WriteTalk = ({ onWrite }: WriteTalkProps) => {
   const [isLoading, setLoading] = useState(false);
-  const [showPasswordInput, setShowPasswordInput] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
 
-  const [storedAuthor, setStoredAuthor] =
-    useSessionStorage("talk.write.author");
-  const [cachedAuthor] = useState(storedAuthor);
-  const [storedMsg, setStoredMsg] = useSessionStorage("talk.write.msg");
-  const [cachedMsg] = useState(storedMsg);
+  const [party, setParty] = useState<Party>();
+  const [color, setColor] = useState(
+    TalkHeadColors[randomInt(0, TalkHeadColors.length - 1)]
+  );
+  const [author, setAuthor] = useState("");
+  const [msg, setMsg] = useState("");
+  const [showStep3, setShowStep3] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const authorErrMsg =
+    author.length === 0
+      ? "이름을 입력해주세요."
+      : author.length > 10
+      ? "이름이 너무 길어요."
+      : undefined;
+  const msgErrMsg =
+    msg.length === 0
+      ? "내용을 입력해주세요."
+      : msg.length < 5
+      ? "내용이 너무 짧아요 (5자 이상)"
+      : msg.length > 100
+      ? "내용이 너무 길어요 (100자 이하)"
+      : undefined;
+  const passwordErrMsg =
+    password.length === 0
+      ? "패스워드를 입력해주세요."
+      : password.length < 4
+      ? "패스워드가 너무 짧아요 (4자 이상)"
+      : undefined;
+
+  const step2ErrMsg = authorErrMsg ?? msgErrMsg;
+  const step3ErrMsg = passwordErrMsg;
 
   useEffect(() => {
-    register("author", {
-      required: "이름을 입력해주세요.",
-      maxLength: { value: 10, message: "이름이 너무 길어요." },
-      value: cachedAuthor || "",
-    });
-    register("msg", {
-      required: "내용을 입력해주세요.",
-      minLength: { value: 5, message: "내용이 너무 짧아요 (5자 이상)" },
-      maxLength: { value: 100, message: "내용이 너무 길어요 (100자 이하)" },
-      value: cachedMsg || "",
-    });
-    register("color", {
-      value: TalkHeadColors[randomInt(0, TalkHeadColors.length - 1)],
-    });
-  }, [register, cachedAuthor, cachedMsg]);
+    setShowValidation(false);
+  }, [author, msg, password]);
 
-  const handleHeadClick: MouseEventHandler<SVGElement> = (e) => {
+  const handleHeadClick: MouseEventHandler<SVGElement> = () => {
     const nextColor =
       TalkHeadColors[
         (TalkHeadColors.indexOf(color) + 1) % TalkHeadColors.length
       ];
-    setValue("color", nextColor);
+    setColor(nextColor);
   };
 
-  const handleNameKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
+  const handleAuthorKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
     }
   };
 
-  const handleNameInput: FormEventHandler<HTMLDivElement> = (e) => {
-    setValue("author", e.currentTarget.textContent || "", {
-      shouldValidate: true,
-    });
-    setStoredAuthor(e.currentTarget.textContent || "");
-  };
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
 
-  const handleMsgInput: FormEventHandler<HTMLDivElement> = (e) => {
-    setValue("msg", e.currentTarget.textContent || "", {
-      shouldValidate: true,
-    });
-    setStoredMsg(e.currentTarget.textContent || "");
-  };
-
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    if (!data.password) {
-      setShowPasswordInput(true);
+    if (step2) {
+      if (step2ErrMsg) return;
+      setShowStep3(true);
       return;
     }
+
+    // step3
+    if (!party) return;
+    if (step3ErrMsg) return;
     try {
       setLoading(true);
+
+      const data: PostTalkRequest = { party, color, author, msg, password };
 
       const resp = await fetch("/api/talk", {
         method: "POST",
@@ -113,24 +107,23 @@ const WriteTalk = ({ onWrite }: Props) => {
       const { id } = (await resp.json()) as PostTalkResponse;
 
       onWrite(id);
-
-      setStoredAuthor("");
-      setStoredMsg("");
     } finally {
       setLoading(false);
     }
   };
 
-  const step1 = !dirtyFields["party"];
-  const step2 = dirtyFields["party"] && !showPasswordInput;
-  const step3 = showPasswordInput;
+  const step1 = !party;
+  const step2 = party && !showStep3;
+  const step3 = showStep3;
 
   const authorInputRef = useRef<HTMLDivElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
+    if (!step2) return;
     authorInputRef.current?.focus();
   }, [step2]);
   useEffect(() => {
+    if (!step3) return;
     passwordInputRef.current?.focus();
   }, [step3]);
 
@@ -140,21 +133,23 @@ const WriteTalk = ({ onWrite }: Props) => {
         😍 <span>나도 한마디</span>
       </Header>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit}>
         {(step1 || step2) && (
           <PartyRow>
             <input
-              {...register("party", { required: true })}
               type="radio"
               value="GROOM"
               id="groom"
+              checked={party === "GROOM"}
+              onChange={(e) => setParty(e.target.value as Party)}
             />
             <PartyLabel htmlFor="groom">🤵🏻‍♂️ 신랑측</PartyLabel>
             <input
-              {...register("party", { required: true })}
               type="radio"
               value="BRIDE"
               id="bride"
+              checked={party === "BRIDE"}
+              onChange={(e) => setParty(e.target.value as Party)}
             />
             <PartyLabel htmlFor="bride">👰🏻‍♀️ 신부측</PartyLabel>
           </PartyRow>
@@ -173,19 +168,15 @@ const WriteTalk = ({ onWrite }: Props) => {
                   contentEditable
                   ref={authorInputRef}
                   party={party}
-                  onKeyDown={handleNameKeyDown}
-                  onInput={handleNameInput}
-                >
-                  {cachedAuthor || ""}
-                </AuthorInput>
+                  onKeyDown={handleAuthorKeyDown}
+                  onInput={(e) => setAuthor(e.currentTarget.innerText)}
+                />
                 <br />
                 <MsgInput
                   contentEditable
                   party={party}
-                  onInput={handleMsgInput}
-                >
-                  {cachedMsg || ""}
-                </MsgInput>
+                  onInput={(e) => setMsg(e.currentTarget.innerText)}
+                />
               </div>
             </BubbleWrap>
           </>
@@ -195,24 +186,26 @@ const WriteTalk = ({ onWrite }: Props) => {
           <PasswordWrap>
             <label htmlFor="password">작성하신 글의 암호를 입력해주세요.</label>
             <PasswordInput
-              {...register("password", {
-                required: true,
-                minLength: {
-                  value: 4,
-                  message: "암호가 너무 짧아요 (4자 이상)",
-                },
-              })}
               ref={passwordInputRef}
               id="password"
               type="password"
+              value={password}
+              onInput={(e) => setPassword(e.currentTarget.value)}
             />
           </PasswordWrap>
         )}
-        {(step2 || step3) && (
+        {step2 && (
           <SubmitButton
             type="submit"
-            value={(formState.isSubmitted && errMsg) || "글쓰기"}
-            isValid={isValid}
+            value={step2ErrMsg || "글쓰기"}
+            isValid={!step2ErrMsg}
+          />
+        )}
+        {step3 && (
+          <SubmitButton
+            type="submit"
+            value={step3ErrMsg || "글쓰기"}
+            isValid={!step3ErrMsg}
           />
         )}
       </form>

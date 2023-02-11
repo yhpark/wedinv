@@ -6,10 +6,10 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 
 import {
   CheckPasswordResponse,
+  Party,
   PatchTalkRequest,
   PostTalkResponse,
   Talk,
@@ -34,81 +34,66 @@ type FormData = PatchTalkRequest;
 type Props = { talk: Talk; onEdit: (id: string) => void };
 
 const WriteTalk = ({ talk, onEdit }: Props) => {
-  const { register, handleSubmit, setValue, setError, watch, formState } =
-    useForm<FormData>({
-      defaultValues: {
-        id: talk.id,
-        author: talk.author,
-        color: talk.color,
-        party: talk.party,
-        msg: talk.msg,
-      },
-    });
-  const { isValid, dirtyFields, errors } = formState;
-
-  const errMsg = Object.values(errors).flatMap((e) =>
-    e.message ? [e.message] : []
-  )[0];
-
-  const party = watch("party");
-  const color = watch("color");
-
   const [isPasswordChecked, setPasswordChecked] = useState(false);
-
   const [isLoading, setLoading] = useState(false);
 
+  const [password, setPassword] = useState("");
+
+  const [party, setParty] = useState<Party>(talk.party);
+  const [color, setColor] = useState(talk.color);
+  const [author, setAuthor] = useState(talk.author);
+  const [msg, setMsg] = useState(talk.msg);
+
+  const [tempErrMsg, setTempErrMsg] = useState<string>();
   useEffect(() => {
-    register("id");
-    register("author", {
-      required: "이름을 입력해주세요.",
-      maxLength: { value: 10, message: "이름이 너무 길어요." },
-    });
-    register("msg", {
-      required: "내용을 입력해주세요.",
-      minLength: { value: 5, message: "내용이 너무 짧아요 (5자 이상)" },
-      maxLength: { value: 100, message: "내용이 너무 길어요 (100자 이하)" },
-    });
-    register("color");
-  }, [register, talk]);
+    setTempErrMsg(undefined);
+  }, [password]);
+
+  const authorErrMsg =
+    author.length === 0
+      ? "이름을 입력해주세요."
+      : author.length > 10
+      ? "이름이 너무 길어요."
+      : undefined;
+  const msgErrMsg =
+    msg.length === 0
+      ? "내용을 입력해주세요."
+      : msg.length < 5
+      ? "내용이 너무 짧아요 (5자 이상)"
+      : msg.length > 100
+      ? "내용이 너무 길어요 (100자 이하)"
+      : undefined;
+
+  const errMsg = tempErrMsg ?? authorErrMsg ?? msgErrMsg;
 
   const handleHeadClick: MouseEventHandler<SVGElement> = (e) => {
     const nextColor =
       TalkHeadColors[
         (TalkHeadColors.indexOf(color) + 1) % TalkHeadColors.length
       ];
-    setValue("color", nextColor);
+    setColor(nextColor);
   };
 
-  const handleNameKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
+  const handleAuthorKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
     }
   };
 
-  const handleNameInput: FormEventHandler<HTMLDivElement> = (e) => {
-    setValue("author", e.currentTarget.textContent || "", {
-      shouldValidate: true,
-    });
-  };
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
 
-  const handleMsgInput: FormEventHandler<HTMLDivElement> = (e) => {
-    setValue("msg", e.currentTarget.textContent || "", {
-      shouldValidate: true,
-    });
-  };
-
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
     if (!isPasswordChecked) {
       try {
         setLoading(true);
 
-        const queryPassword = encodeURIComponent(data.password);
+        const queryPassword = encodeURIComponent(password);
         const resp = await fetch(
           `/api/talk/checkpw?id=${talk.id}&password=${queryPassword}`
         );
         const { check } = (await resp.json()) as CheckPasswordResponse;
         if (!check) {
-          setError("password", { message: "암호가 맞지 않습니다." });
+          setTempErrMsg("암호가 맞지 않습니다.");
           return;
         }
 
@@ -120,6 +105,15 @@ const WriteTalk = ({ talk, onEdit }: Props) => {
     }
     try {
       setLoading(true);
+
+      const data: PatchTalkRequest = {
+        id: talk.id,
+        party,
+        color,
+        author,
+        msg,
+        password,
+      };
 
       const resp = await fetch("/api/talk", {
         method: "PATCH",
@@ -136,7 +130,7 @@ const WriteTalk = ({ talk, onEdit }: Props) => {
 
   return (
     <Wrap>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit}>
         <Header>
           ✍️ <span>글 수정하기</span>
         </Header>
@@ -144,17 +138,19 @@ const WriteTalk = ({ talk, onEdit }: Props) => {
           <>
             <PartyRow>
               <input
-                {...register("party", { required: true })}
                 type="radio"
                 value="GROOM"
                 id="groom"
+                checked={party === "GROOM"}
+                onChange={(e) => setParty(e.target.value as Party)}
               />
               <PartyLabel htmlFor="groom">🤵🏻‍♂️ 신랑측</PartyLabel>
               <input
-                {...register("party", { required: true })}
                 type="radio"
                 value="BRIDE"
                 id="bride"
+                checked={party === "BRIDE"}
+                onChange={(e) => setParty(e.target.value as Party)}
               />
               <PartyLabel htmlFor="bride">👰🏻‍♀️ 신부측</PartyLabel>
             </PartyRow>
@@ -168,8 +164,8 @@ const WriteTalk = ({ talk, onEdit }: Props) => {
                 <AuthorInput
                   contentEditable
                   party={party}
-                  onKeyDown={handleNameKeyDown}
-                  onInput={handleNameInput}
+                  onKeyDown={handleAuthorKeyDown}
+                  onInput={(e) => setAuthor(e.currentTarget.textContent || "")}
                 >
                   {talk.author}
                 </AuthorInput>
@@ -177,7 +173,7 @@ const WriteTalk = ({ talk, onEdit }: Props) => {
                 <MsgInput
                   contentEditable
                   party={party}
-                  onInput={handleMsgInput}
+                  onInput={(e) => setMsg(e.currentTarget.textContent || "")}
                 >
                   {talk.msg}
                 </MsgInput>
@@ -190,20 +186,22 @@ const WriteTalk = ({ talk, onEdit }: Props) => {
           <PasswordWrap>
             <label htmlFor="password">작성하신 글의 암호를 입력해주세요.</label>
             <PasswordInput
-              {...register("password", { required: true })}
               id="password"
               type="password"
+              value={password}
+              onInput={(e) => setPassword(e.currentTarget.value)}
             />
           </PasswordWrap>
         )}
-        <SubmitButton
-          type="submit"
-          value={
-            (formState.isSubmitted && errMsg) ||
-            (isPasswordChecked ? "수정하기" : "암호 확인")
-          }
-          isValid={isValid || !isPasswordChecked}
-        />
+        {!isPasswordChecked ? (
+          <SubmitButton type="submit" value={errMsg || "암호 확인"} isValid />
+        ) : (
+          <SubmitButton
+            type="submit"
+            value={errMsg || "수정하기"}
+            isValid={!errMsg}
+          />
+        )}
       </form>
       {isLoading && <LoadingOverlay />}
     </Wrap>
