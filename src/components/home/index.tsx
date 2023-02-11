@@ -8,6 +8,10 @@ import React, {
   useRef,
   useState,
 } from "react";
+import QuickPinchZoom, {
+  make3dTransformValue,
+  UpdateAction,
+} from "react-quick-pinch-zoom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import styled, { css } from "styled-components";
@@ -16,13 +20,10 @@ import useSWR from "swr";
 import { useSessionStorage } from "@/common/hooks/useStorage";
 import timeDiffFormat from "@/common/utils/timeDiffFormat";
 import Modal from "@/components/common/Modal";
+import { Content } from "@/content";
 import coverPic from "@/public/photos/cover_min.jpg";
 import mapPic from "@/public/photos/map.gif";
 import { GetTalkListResponse, Party, Talk } from "@/talk/types";
-import QuickPinchZoom, {
-  make3dTransformValue,
-  UpdateAction,
-} from "react-quick-pinch-zoom";
 import {
   BoxShadowStyle,
   BubbleHeadStyle,
@@ -52,7 +53,8 @@ const Header = styled.h1`
 
 const CoverPicWrap = styled.div`
   position: relative;
-  width: 90%;
+  width: calc(100% - 40px);
+  aspect-ratio: ${coverPic.width / coverPic.height};
   margin: 0 auto;
   margin-bottom: 40px;
   border-radius: 30px;
@@ -86,6 +88,7 @@ const LiveButton = styled.button`
 `;
 
 const GreetingP = styled.p`
+  white-space: pre;
   margin: 30px 0;
 `;
 
@@ -207,8 +210,12 @@ const PinchPhoto = ({ src, onZoom }: PinchPhotoProps) => {
   );
 };
 
-type PhotoGalleryProps = { initialSlide?: number; onClose: () => void };
-const PhotoGallery = ({ initialSlide, onClose }: PhotoGalleryProps) => {
+type PhotoGalleryProps = {
+  photos: Content["photos"];
+  initialSlide?: number;
+  onClose: () => void;
+};
+const PhotoGallery = ({ photos, initialSlide, onClose }: PhotoGalleryProps) => {
   const [isZoomed, setZoomed] = useState(false);
   return (
     <SliderWrap isZoomed={isZoomed} onClick={onClose}>
@@ -219,9 +226,12 @@ const PhotoGallery = ({ initialSlide, onClose }: PhotoGalleryProps) => {
         arrows={false}
         dots={false}
       >
-        {Array.from(Array(14), (_, i) => i + 1).map((i) => (
+        {photos.map((p, i) => (
           <div key={i}>
-            <PinchPhoto onZoom={setZoomed} src={`/photos/p${i}.jpeg`} />
+            <PinchPhoto
+              src={typeof p === "string" ? p : p.url}
+              onZoom={setZoomed}
+            />
           </div>
         ))}
       </Slider>
@@ -478,7 +488,9 @@ const ThankYou = styled.div`
   color: #666;
 `;
 
-const Home = () => {
+type HomeProps = { content: Content };
+
+const Home = ({ content: c }: HomeProps) => {
   const [writeDone, setWriteDone] = useSessionStorage("talk.writedone");
   const {
     data: talkListResp,
@@ -542,56 +554,44 @@ const Home = () => {
   return (
     <Main>
       <Header>
-        박영훈
+        {c.groomFullName}
         <hr />
-        김현주
+        {c.brideFullName}
       </Header>
       <CoverPicWrap>
-        <Image
-          src={coverPic}
-          width={400}
-          height={534}
-          priority={true}
-          placeholder="blur"
-          alt=""
-        />
+        <Image src={coverPic} fill priority={true} placeholder="blur" alt="" />
       </CoverPicWrap>
       <p>
-        2021년 10월 3일 일요일 오후 1시
+        {c.datetime}
         <br />
-        반포 JW 메리어트 호텔 5층 그랜드볼룸
+        {c.venue.desc}
       </p>
-      <Link href="/live" passHref>
-        <LiveButton>📹 결혼식 생중계 보러가기</LiveButton>
-      </Link>
+      {c.link && (
+        <Link href={c.link.url} passHref>
+          <LiveButton>{c.link.label}</LiveButton>
+        </Link>
+      )}
+
       <SectionHr />
 
-      <SectionHeader>결혼합니다.</SectionHeader>
-      <GreetingP>
-        청명한 가을날
-        <br />
-        새로이 시작하는 작은 사랑이
-        <br />
-        보다 크고 깊은 사랑이 되려고 합니다.
-        <br />
-        함께 자리하시어 축복해 주시면
-        <br />
-        더없는 기쁨이겠습니다.
-      </GreetingP>
-      <GreetingP>
-        김종오 · 강경자의 장녀 현주
-        <br />
-        박민양 · 최승현의 차남 영훈
-      </GreetingP>
+      <SectionHeader>{c.greeting.title}</SectionHeader>
+      {c.greeting.content.map((p) => (
+        <GreetingP>
+          {p
+            .split("\n")
+            .map((l) => l.trim())
+            .join("\n")}
+        </GreetingP>
+      ))}
       <CallWrap>
-        <a href="tel:01071056849">
+        <a href={c.groomContact}>
           <CallButton
             icon={<EmojiLookRight />}
             bgColor="#abdaab"
             label="신랑측에 연락하기"
           />
         </a>
-        <a href="tel:01073692869">
+        <a href={c.brideContact}>
           <CallButton
             icon={<EmojiLookLeft />}
             bgColor="#c2e0a3"
@@ -601,15 +601,18 @@ const Home = () => {
       </CallWrap>
       <SectionHr />
       <PhotoGrid>
-        {Array.from(Array(14), (_, i) => i).map((i) => (
+        {c.photos.map((p, i) => (
           <li key={i}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               role="button"
-              src={`/photos/p${i + 1}.jpeg`}
+              src={typeof p === "string" ? p : p.url}
               onClick={() => handlePhotoClick(i)}
               loading="lazy"
               alt=""
+              style={
+                p.objectPosition ? { objectPosition: p.objectPosition } : {}
+              }
             />
           </li>
         ))}
@@ -617,6 +620,7 @@ const Home = () => {
       {showGalleryModal && (
         <Modal handleClose={handleGalleryModalClose}>
           <PhotoGallery
+            photos={c.photos}
             initialSlide={lastClickedGalleryItem}
             onClose={handleGalleryModalClose}
           />
@@ -626,28 +630,38 @@ const Home = () => {
       <SectionHeader>오시는 길</SectionHeader>
       <Image src={mapPic} width={400} alt="" />
       <p>
-        서울 서초구 신반포로 176
+        {c.venue.address}
         <br />
-        반포 JW 메리어트 호텔 5층 그랜드볼룸
+        {c.venue.desc}
       </p>
-      <MapButton href="https://place.map.kakao.com/8005133">
+      <MapButton href={c.venue.kakaoMapUrl}>
         <PinAlt color="#1199EE" /> 카카오맵
       </MapButton>
-      <MapButton href="https://map.naver.com/v5/entry/place/11583195">
+      <MapButton href={c.venue.naverMapUrl}>
         <PinAlt color="#66BB66" /> 네이버지도
       </MapButton>
       <SectionHr />
       <SectionHeader>💸 마음 전하실 곳</SectionHeader>
       <GiveWrap>
         <p>
-          <strong>신랑측</strong> (박영훈)
+          <strong>신랑측</strong>
           <br />
-          <CopyText text="카카오뱅크 3333-07-0052253" />
+          {c.groomGive.map((g) => (
+            <>
+              {g.name} <CopyText text={g.account} />
+              <br />
+            </>
+          ))}
         </p>
         <p>
-          <strong>신부측</strong> (김현주)
+          <strong>신부측</strong>
           <br />
-          <CopyText text="우리은행 1002-291-920831" />
+          {c.brideGive.map((g) => (
+            <>
+              {g.name} <CopyText text={g.account} />
+              <br />
+            </>
+          ))}
         </p>
       </GiveWrap>
       <SectionHr />
